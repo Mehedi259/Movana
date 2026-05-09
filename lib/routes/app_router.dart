@@ -32,6 +32,12 @@ import '../features/profile/presentation/screens/change_password_screen.dart';
 import '../features/profile/presentation/screens/contact_support_screen.dart';
 import '../features/profile/presentation/screens/privacy_policy_screen.dart';
 import '../features/profile/presentation/screens/terms_conditions_screen.dart';
+import '../features/bookings/presentation/screens/review_screen.dart';
+import '../features/bookings/presentation/screens/booking_details_screen.dart';
+import '../features/class/presentation/screens/class_schedule_screen.dart';
+import '../features/favorites/presentation/screens/favorite_classes_screen.dart';
+import '../features/search/presentation/screens/search_map_screen.dart';
+import '../features/reservation/presentation/screens/booking_confirmation_screen.dart';
 
 class AppRouter {
   static Route<dynamic> generateRoute(RouteSettings settings) {
@@ -109,6 +115,20 @@ class AppRouter {
         return MaterialPageRoute(builder: (_) => const PrivacyPolicyScreen());
       case AppRoutes.termsConditions:
         return MaterialPageRoute(builder: (_) => const TermsConditionsScreen());
+      
+      // Additional Routes
+      case AppRoutes.review:
+        return MaterialPageRoute(builder: (_) => const ReviewScreen());
+      case AppRoutes.bookingDetails:
+        return MaterialPageRoute(builder: (_) => const BookingDetailsScreen());
+      case AppRoutes.classSchedule:
+        return MaterialPageRoute(builder: (_) => const ClassScheduleScreen());
+      case AppRoutes.favoriteClasses:
+        return MaterialPageRoute(builder: (_) => const FavoriteClassesScreen());
+      case AppRoutes.searchMap:
+        return MaterialPageRoute(builder: (_) => const SearchMapScreen());
+      case AppRoutes.bookingConfirmation:
+        return MaterialPageRoute(builder: (_) => const BookingConfirmationScreen());
       
       default:
         return MaterialPageRoute(

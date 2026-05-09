@@ -40,4 +40,12 @@ class AppRoutes {
   static const String contactSupport = '/contact-support';
   static const String privacyPolicy = '/privacy-policy';
   static const String termsConditions = '/terms-conditions';
+  
+  // Additional Routes
+  static const String review = '/review';
+  static const String bookingDetails = '/booking-details';
+  static const String classSchedule = '/class-schedule';
+  static const String favoriteClasses = '/favorite-classes';
+  static const String searchMap = '/search-map';
+  static const String bookingConfirmation = '/booking-confirmation';
 }
