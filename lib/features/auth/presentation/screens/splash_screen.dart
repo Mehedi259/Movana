@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_routes.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -28,47 +27,12 @@ class _SplashScreenState extends State<SplashScreen> {
     return Scaffold(
       backgroundColor: Colors.white,
       body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            // Logo
-            Container(
-              width: 200,
-              height: 200,
-              decoration: BoxDecoration(
-                color: AppColors.primary.withOpacity(0.1),
-                shape: BoxShape.circle,
-              ),
-              child: Center(
-                child: Icon(
-                  Icons.fitness_center,
-                  size: 100,
-                  color: AppColors.primary,
-                ),
-              ),
-            ),
-            const SizedBox(height: 32),
-            // App Name
-            Text(
-              'MOVANA',
-              style: TextStyle(
-                fontSize: 36,
-                fontWeight: FontWeight.bold,
-                color: AppColors.primary,
-                letterSpacing: 2,
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              'GYM & FITNESS',
-              style: TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w500,
-                color: AppColors.textSecondary,
-                letterSpacing: 4,
-              ),
-            ),
-          ],
+        child: Padding(
+          padding: const EdgeInsets.all(40.0),
+          child: Image.asset(
+            'assets/SplashScreenLogo.png',
+            fit: BoxFit.contain,
+          ),
         ),
       ),
     );

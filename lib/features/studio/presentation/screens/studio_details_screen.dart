@@ -16,33 +16,46 @@ class _StudioDetailsScreenState extends State<StudioDetailsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppColors.background,
       body: CustomScrollView(
         slivers: [
           // App Bar with Image
           SliverAppBar(
             expandedHeight: 300,
             pinned: true,
+            backgroundColor: AppColors.background,
             flexibleSpace: FlexibleSpaceBar(
               background: Stack(
                 fit: StackFit.expand,
                 children: [
-                  Container(
-                    color: Colors.grey[300],
+                  Image.asset(
+                    'assets/ZenFlowStudio.png',
+                    fit: BoxFit.cover,
                   ),
                   Positioned(
                     top: 50,
                     right: 16,
-                    child: IconButton(
-                      icon: Icon(
-                        _isFavorite ? Icons.favorite : Icons.favorite_border,
-                        color: _isFavorite ? Colors.red : Colors.white,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        shape: BoxShape.circle,
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withValues(alpha: 0.1),
+                            blurRadius: 8,
+                            spreadRadius: 0,
+                          ),
+                        ],
                       ),
-                      style: IconButton.styleFrom(
-                        backgroundColor: Colors.black26,
+                      child: IconButton(
+                        icon: Icon(
+                          _isFavorite ? Icons.favorite : Icons.favorite_border,
+                          color: _isFavorite ? Colors.red : AppColors.textDark,
+                        ),
+                        onPressed: () {
+                          setState(() => _isFavorite = !_isFavorite);
+                        },
                       ),
-                      onPressed: () {
-                        setState(() => _isFavorite = !_isFavorite);
-                      },
                     ),
                   ),
                 ],
@@ -69,23 +82,33 @@ class _StudioDetailsScreenState extends State<StudioDetailsScreen> {
                       ),
                       const SizedBox(height: 12),
                       // Studio Name
-                      const Text(
+                      Text(
                         'Zen Flow Studio',
                         style: TextStyle(
-                          fontSize: 28,
-                          fontWeight: FontWeight.bold,
+                          fontSize: 24,
+                          fontWeight: FontWeight.w700,
+                          color: AppColors.textPrimary,
+                          height: 1.33,
                         ),
                       ),
                       const SizedBox(height: 8),
                       // Location
                       Row(
                         children: [
-                          const Icon(Icons.location_on, size: 16),
+                          Icon(
+                            Icons.location_on,
+                            size: 16,
+                            color: AppColors.textSecondary,
+                          ),
                           const SizedBox(width: 4),
                           Expanded(
                             child: Text(
                               '1.2 km away • Downtown',
-                              style: TextStyle(color: AppColors.textSecondary),
+                              style: TextStyle(
+                                color: AppColors.textSecondary,
+                                fontSize: 14,
+                                height: 1.43,
+                              ),
                             ),
                           ),
                         ],
@@ -96,19 +119,24 @@ class _StudioDetailsScreenState extends State<StudioDetailsScreen> {
                         children: [
                           const Icon(Icons.star, size: 16, color: Colors.amber),
                           const SizedBox(width: 4),
-                          const Text(
+                          Text(
                             '4.9 (128 reviews)',
-                            style: TextStyle(fontWeight: FontWeight.w600),
+                            style: TextStyle(
+                              fontWeight: FontWeight.w600,
+                              fontSize: 14,
+                              color: AppColors.textDark,
+                            ),
                           ),
                         ],
                       ),
-                      const SizedBox(height: 24),
+                      const SizedBox(height: 20),
                       // About
-                      const Text(
+                      Text(
                         'About',
                         style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w700,
+                          color: AppColors.textPrimary,
                         ),
                       ),
                       const SizedBox(height: 8),
@@ -116,16 +144,18 @@ class _StudioDetailsScreenState extends State<StudioDetailsScreen> {
                         'Zen Flow Studio offers a peaceful sanctuary for yoga and pilates enthusiasts. Our experienced instructors guide you through mindful practices that strengthen both body and mind.',
                         style: TextStyle(
                           color: AppColors.textSecondary,
+                          fontSize: 14,
                           height: 1.5,
                         ),
                       ),
-                      const SizedBox(height: 24),
+                      const SizedBox(height: 20),
                       // Amenities
-                      const Text(
+                      Text(
                         'Amenities',
                         style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w700,
+                          color: AppColors.textPrimary,
                         ),
                       ),
                       const SizedBox(height: 12),
@@ -139,21 +169,29 @@ class _StudioDetailsScreenState extends State<StudioDetailsScreen> {
                           _AmenityChip(icon: Icons.water_drop, label: 'Water'),
                         ],
                       ),
-                      const SizedBox(height: 24),
+                      const SizedBox(height: 20),
                       // Available Classes
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          const Text(
+                          Text(
                             'Available Classes',
                             style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
+                              fontWeight: FontWeight.w700,
+                              color: AppColors.textPrimary,
                             ),
                           ),
-                          TextButton(
-                            onPressed: () {},
-                            child: const Text('See all'),
+                          Text(
+                            'See all',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              color: AppColors.textDark,
+                              fontSize: 12,
+                              fontWeight: FontWeight.w500,
+                              decoration: TextDecoration.underline,
+                              height: 1.50,
+                            ),
                           ),
                         ],
                       ),
@@ -169,6 +207,7 @@ class _StudioDetailsScreenState extends State<StudioDetailsScreen> {
                   instructor: 'Sarah Johnson',
                   credits: '2 cr',
                   spotsLeft: 4,
+                  imagePath: 'assets/Morning.png',
                   onTap: () {
                     Navigator.pushNamed(context, AppRoutes.classDetails);
                   },
@@ -180,6 +219,7 @@ class _StudioDetailsScreenState extends State<StudioDetailsScreen> {
                   instructor: 'Mike Chen',
                   credits: '3 cr',
                   spotsLeft: 2,
+                  imagePath: 'assets/Pilates.png',
                   onTap: () {
                     Navigator.pushNamed(context, AppRoutes.classDetails);
                   },
@@ -191,6 +231,7 @@ class _StudioDetailsScreenState extends State<StudioDetailsScreen> {
                   instructor: 'Emma Davis',
                   credits: '2 cr',
                   spotsLeft: 8,
+                  imagePath: 'assets/Yoga.png',
                   onTap: () {
                     Navigator.pushNamed(context, AppRoutes.classDetails);
                   },
@@ -207,8 +248,10 @@ class _StudioDetailsScreenState extends State<StudioDetailsScreen> {
           color: Colors.white,
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.05),
-              blurRadius: 10,
+              color: AppColors.cardShadow,
+              blurRadius: 12,
+              offset: const Offset(0, -2),
+              spreadRadius: 0,
             ),
           ],
         ),
@@ -231,12 +274,20 @@ class _CategoryChip extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
-        color: AppColors.background,
-        borderRadius: BorderRadius.circular(20),
+        color: AppColors.surfaceLight,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(
+          width: 1,
+          color: AppColors.border,
+        ),
       ),
       child: Text(
         label,
-        style: const TextStyle(fontSize: 12),
+        style: TextStyle(
+          fontSize: 12,
+          fontWeight: FontWeight.w600,
+          color: AppColors.textDark,
+        ),
       ),
     );
   }
@@ -254,17 +305,32 @@ class _AmenityChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
       decoration: BoxDecoration(
-        color: AppColors.background,
-        borderRadius: BorderRadius.circular(20),
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          width: 1,
+          color: AppColors.border,
+        ),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, size: 16),
+          Icon(
+            icon,
+            size: 18,
+            color: AppColors.primary,
+          ),
           const SizedBox(width: 8),
-          Text(label),
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w500,
+              color: AppColors.textDark,
+            ),
+          ),
         ],
       ),
     );
@@ -278,6 +344,7 @@ class _ClassCard extends StatelessWidget {
   final String instructor;
   final String credits;
   final int spotsLeft;
+  final String imagePath;
   final VoidCallback onTap;
 
   const _ClassCard({
@@ -287,91 +354,119 @@ class _ClassCard extends StatelessWidget {
     required this.instructor,
     required this.credits,
     required this.spotsLeft,
+    required this.imagePath,
     required this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(12),
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Row(
-            children: [
-              Container(
-                width: 60,
-                height: 60,
-                decoration: BoxDecoration(
-                  color: Colors.grey[300],
-                  borderRadius: BorderRadius.circular(8),
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        width: double.infinity,
+        margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 6),
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12),
+          boxShadow: [
+            BoxShadow(
+              color: AppColors.cardShadow,
+              blurRadius: 12,
+              offset: const Offset(0, 2),
+              spreadRadius: 0,
+            ),
+          ],
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 70,
+              height: 70,
+              clipBehavior: Clip.antiAlias,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(8),
+                image: DecorationImage(
+                  image: AssetImage(imagePath),
+                  fit: BoxFit.cover,
                 ),
               ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      name,
-                      style: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16,
-                      ),
+            ),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    name,
+                    style: TextStyle(
+                      color: AppColors.textPrimary,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w400,
+                      height: 1.38,
                     ),
-                    const SizedBox(height: 4),
-                    Text(
-                      '$time • $duration',
-                      style: TextStyle(
-                        color: AppColors.textSecondary,
-                        fontSize: 14,
-                      ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    '$time • $duration',
+                    style: TextStyle(
+                      color: AppColors.textSecondary,
+                      fontSize: 12,
+                      fontWeight: FontWeight.w400,
+                      height: 1.50,
                     ),
-                    const SizedBox(height: 4),
-                    Text(
-                      'with $instructor',
-                      style: TextStyle(
-                        color: AppColors.textSecondary,
-                        fontSize: 12,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Row(
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 8,
-                            vertical: 4,
-                          ),
-                          decoration: BoxDecoration(
-                            color: AppColors.background,
-                            borderRadius: BorderRadius.circular(4),
-                          ),
-                          child: Text(
-                            credits,
-                            style: const TextStyle(fontSize: 12),
+                  ),
+                  const SizedBox(height: 8),
+                  Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 2,
+                        ),
+                        decoration: BoxDecoration(
+                          color: AppColors.successLight,
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                        child: Text(
+                          '⚡$credits',
+                          style: TextStyle(
+                            color: AppColors.successText,
+                            fontSize: 10,
+                            fontWeight: FontWeight.w400,
+                            height: 1.60,
                           ),
                         ),
-                        const SizedBox(width: 8),
-                        Text(
+                      ),
+                      const SizedBox(width: 8),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 2,
+                        ),
+                        decoration: BoxDecoration(
+                          border: Border.all(
+                            width: 1,
+                            color: AppColors.borderLight,
+                          ),
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                        child: Text(
                           '$spotsLeft spots left',
                           style: TextStyle(
-                            fontSize: 12,
-                            color: spotsLeft < 5
-                                ? AppColors.error
-                                : AppColors.textSecondary,
+                            color: AppColors.textSecondary,
+                            fontSize: 10,
+                            fontWeight: FontWeight.w400,
+                            height: 1.60,
                           ),
                         ),
-                      ],
-                    ),
-                  ],
-                ),
+                      ),
+                    ],
+                  ),
+                ],
               ),
-              const Icon(Icons.chevron_right),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );

@@ -16,33 +16,46 @@ class _ClassDetailsScreenState extends State<ClassDetailsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppColors.background,
       body: CustomScrollView(
         slivers: [
           // App Bar with Image
           SliverAppBar(
             expandedHeight: 250,
             pinned: true,
+            backgroundColor: AppColors.background,
             flexibleSpace: FlexibleSpaceBar(
               background: Stack(
                 fit: StackFit.expand,
                 children: [
-                  Container(
-                    color: Colors.grey[300],
+                  Image.asset(
+                    'assets/Morning.png',
+                    fit: BoxFit.cover,
                   ),
                   Positioned(
                     top: 50,
                     right: 16,
-                    child: IconButton(
-                      icon: Icon(
-                        _isFavorite ? Icons.favorite : Icons.favorite_border,
-                        color: _isFavorite ? Colors.red : Colors.white,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        shape: BoxShape.circle,
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withValues(alpha: 0.1),
+                            blurRadius: 8,
+                            spreadRadius: 0,
+                          ),
+                        ],
                       ),
-                      style: IconButton.styleFrom(
-                        backgroundColor: Colors.black26,
+                      child: IconButton(
+                        icon: Icon(
+                          _isFavorite ? Icons.favorite : Icons.favorite_border,
+                          color: _isFavorite ? Colors.red : AppColors.textDark,
+                        ),
+                        onPressed: () {
+                          setState(() => _isFavorite = !_isFavorite);
+                        },
                       ),
-                      onPressed: () {
-                        setState(() => _isFavorite = !_isFavorite);
-                      },
                     ),
                   ),
                 ],
@@ -57,11 +70,13 @@ class _ClassDetailsScreenState extends State<ClassDetailsScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   // Class Name
-                  const Text(
+                  Text(
                     'Morning Vinyasa Flow',
                     style: TextStyle(
-                      fontSize: 28,
-                      fontWeight: FontWeight.bold,
+                      fontSize: 24,
+                      fontWeight: FontWeight.w700,
+                      color: AppColors.textPrimary,
+                      height: 1.33,
                     ),
                   ),
                   const SizedBox(height: 8),
@@ -69,8 +84,9 @@ class _ClassDetailsScreenState extends State<ClassDetailsScreen> {
                   Text(
                     'Zen Flow Studio',
                     style: TextStyle(
-                      fontSize: 16,
+                      fontSize: 14,
                       color: AppColors.textSecondary,
+                      height: 1.43,
                     ),
                   ),
                   const SizedBox(height: 16),
@@ -114,13 +130,14 @@ class _ClassDetailsScreenState extends State<ClassDetailsScreen> {
                       ),
                     ],
                   ),
-                  const SizedBox(height: 24),
+                  const SizedBox(height: 20),
                   // Schedule
-                  const Text(
+                  Text(
                     'Schedule',
                     style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w700,
+                      color: AppColors.textPrimary,
                     ),
                   ),
                   const SizedBox(height: 12),
@@ -133,13 +150,14 @@ class _ClassDetailsScreenState extends State<ClassDetailsScreen> {
                     icon: Icons.access_time,
                     text: '07:00 AM - 08:00 AM',
                   ),
-                  const SizedBox(height: 24),
+                  const SizedBox(height: 20),
                   // Instructor
-                  const Text(
+                  Text(
                     'Instructor',
                     style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w700,
+                      color: AppColors.textPrimary,
                     ),
                   ),
                   const SizedBox(height: 12),
@@ -190,13 +208,14 @@ class _ClassDetailsScreenState extends State<ClassDetailsScreen> {
                       ),
                     ],
                   ),
-                  const SizedBox(height: 24),
+                  const SizedBox(height: 20),
                   // Location
-                  const Text(
+                  Text(
                     'Location',
                     style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w700,
+                      color: AppColors.textPrimary,
                     ),
                   ),
                   const SizedBox(height: 12),
@@ -213,13 +232,14 @@ class _ClassDetailsScreenState extends State<ClassDetailsScreen> {
                       label: const Text('View on Map'),
                     ),
                   ),
-                  const SizedBox(height: 24),
+                  const SizedBox(height: 20),
                   // About Class
-                  const Text(
+                  Text(
                     'About This Class',
                     style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w700,
+                      color: AppColors.textPrimary,
                     ),
                   ),
                   const SizedBox(height: 8),
@@ -227,16 +247,18 @@ class _ClassDetailsScreenState extends State<ClassDetailsScreen> {
                     'Start your day with an energizing vinyasa flow that connects breath with movement. This class is suitable for all levels and focuses on building strength, flexibility, and mindfulness.',
                     style: TextStyle(
                       color: AppColors.textSecondary,
+                      fontSize: 14,
                       height: 1.5,
                     ),
                   ),
-                  const SizedBox(height: 24),
+                  const SizedBox(height: 20),
                   // What to Bring
-                  const Text(
+                  Text(
                     'What to Bring',
                     style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w700,
+                      color: AppColors.textPrimary,
                     ),
                   ),
                   const SizedBox(height: 12),
@@ -257,8 +279,10 @@ class _ClassDetailsScreenState extends State<ClassDetailsScreen> {
           color: Colors.white,
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.05),
-              blurRadius: 10,
+              color: AppColors.cardShadow,
+              blurRadius: 12,
+              offset: const Offset(0, -2),
+              spreadRadius: 0,
             ),
           ],
         ),
@@ -287,28 +311,38 @@ class _InfoCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: AppColors.background,
+        color: Colors.white,
         borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          width: 1,
+          color: AppColors.border,
+        ),
       ),
       child: Column(
         children: [
-          Icon(icon, color: AppColors.primary),
+          Icon(
+            icon,
+            color: AppColors.primary,
+            size: 24,
+          ),
           const SizedBox(height: 8),
           Text(
             title,
             style: TextStyle(
               fontSize: 12,
               color: AppColors.textSecondary,
+              fontWeight: FontWeight.w500,
             ),
           ),
           const SizedBox(height: 4),
           Text(
             value,
-            style: const TextStyle(
-              fontWeight: FontWeight.bold,
+            style: TextStyle(
+              fontWeight: FontWeight.w700,
               fontSize: 16,
+              color: AppColors.textDark,
             ),
           ),
         ],
