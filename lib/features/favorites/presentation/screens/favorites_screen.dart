@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_routes.dart';
+import '../../../../shared/widgets/custom_bottom_nav_bar.dart';
 
 class FavoritesScreen extends StatefulWidget {
   const FavoritesScreen({super.key});
@@ -50,7 +51,7 @@ class _FavoritesScreenState extends State<FavoritesScreen>
           _buildClassesTab(),
         ],
       ),
-      bottomNavigationBar: _BottomNavBar(currentIndex: 3),
+      bottomNavigationBar: const CustomBottomNavBar(currentIndex: 3),
     );
   }
 
@@ -239,66 +240,6 @@ class _FavoriteStudioCardState extends State<_FavoriteStudioCard> {
           ),
         ),
       ),
-    );
-  }
-}
-
-class _BottomNavBar extends StatelessWidget {
-  final int currentIndex;
-
-  const _BottomNavBar({required this.currentIndex});
-
-  @override
-  Widget build(BuildContext context) {
-    return BottomNavigationBar(
-      currentIndex: currentIndex,
-      type: BottomNavigationBarType.fixed,
-      selectedItemColor: AppColors.primary,
-      unselectedItemColor: AppColors.textSecondary,
-      onTap: (index) {
-        switch (index) {
-          case 0:
-            Navigator.pushReplacementNamed(context, AppRoutes.home);
-            break;
-          case 1:
-            Navigator.pushNamed(context, AppRoutes.search);
-            break;
-          case 2:
-            Navigator.pushNamed(context, AppRoutes.bookings);
-            break;
-          case 3:
-            break;
-          case 4:
-            Navigator.pushNamed(context, AppRoutes.profile);
-            break;
-        }
-      },
-      items: const [
-        BottomNavigationBarItem(
-          icon: Icon(Icons.home_outlined),
-          activeIcon: Icon(Icons.home),
-          label: 'Home',
-        ),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.search),
-          label: 'Search',
-        ),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.calendar_today_outlined),
-          activeIcon: Icon(Icons.calendar_today),
-          label: 'Bookings',
-        ),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.favorite_outline),
-          activeIcon: Icon(Icons.favorite),
-          label: 'Favorites',
-        ),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.person_outline),
-          activeIcon: Icon(Icons.person),
-          label: 'Profile',
-        ),
-      ],
     );
   }
 }

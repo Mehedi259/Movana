@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_routes.dart';
+import '../../../../shared/widgets/custom_bottom_nav_bar.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -20,10 +21,12 @@ class HomeScreen extends StatelessWidget {
                 // Header
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
                         children: [
                           Row(
                             children: [
@@ -32,31 +35,36 @@ class HomeScreen extends StatelessWidget {
                                 size: 16,
                                 color: AppColors.textSecondary,
                               ),
-                              const SizedBox(width: 8),
-                              Text(
-                                'San Francisco, CA',
-                                style: TextStyle(
-                                  color: AppColors.textSecondary,
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w500,
-                                  height: 1.50,
+                              const SizedBox(width: 4),
+                              Flexible(
+                                child: Text(
+                                  'San Francisco, CA',
+                                  style: TextStyle(
+                                    color: AppColors.textSecondary,
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w500,
+                                    height: 1.33,
+                                  ),
+                                  overflow: TextOverflow.ellipsis,
                                 ),
                               ),
                             ],
                           ),
-                          const SizedBox(height: 2),
+                          const SizedBox(height: 4),
                           Text(
                             'Good Evening, Alex',
                             style: TextStyle(
                               color: AppColors.textPrimary,
-                              fontSize: 20,
+                              fontSize: 18,
                               fontWeight: FontWeight.w700,
-                              height: 1.50,
+                              height: 1.33,
                             ),
+                            overflow: TextOverflow.ellipsis,
                           ),
                         ],
                       ),
                     ),
+                    const SizedBox(width: 8),
                     Container(
                       padding: const EdgeInsets.symmetric(
                         horizontal: 12,
@@ -72,7 +80,7 @@ class HomeScreen extends StatelessWidget {
                           color: AppColors.textSecondary,
                           fontSize: 10,
                           fontWeight: FontWeight.w500,
-                          height: 1.60,
+                          height: 1.40,
                         ),
                       ),
                     ),
@@ -84,7 +92,7 @@ class HomeScreen extends StatelessWidget {
                   width: double.infinity,
                   padding: const EdgeInsets.symmetric(
                     horizontal: 12,
-                    vertical: 6,
+                    vertical: 8,
                   ),
                   decoration: BoxDecoration(
                     color: AppColors.surfaceLight,
@@ -93,25 +101,32 @@ class HomeScreen extends StatelessWidget {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Row(
-                        children: [
-                          Icon(
-                            Icons.bolt,
-                            size: 16,
-                            color: AppColors.textDark,
-                          ),
-                          const SizedBox(width: 6),
-                          Text(
-                            '12 credits remaining',
-                            style: TextStyle(
+                      Flexible(
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              Icons.bolt,
+                              size: 16,
                               color: AppColors.textDark,
-                              fontSize: 12,
-                              fontWeight: FontWeight.w600,
-                              height: 1.50,
                             ),
-                          ),
-                        ],
+                            const SizedBox(width: 6),
+                            Flexible(
+                              child: Text(
+                                '12 credits remaining',
+                                style: TextStyle(
+                                  color: AppColors.textDark,
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w600,
+                                  height: 1.33,
+                                ),
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
+                      const SizedBox(width: 8),
                       Container(
                         padding: const EdgeInsets.symmetric(
                           horizontal: 8,
@@ -128,7 +143,7 @@ class HomeScreen extends StatelessWidget {
                             color: Colors.white,
                             fontSize: 12,
                             fontWeight: FontWeight.w600,
-                            height: 1.50,
+                            height: 1.33,
                           ),
                         ),
                       ),
@@ -140,7 +155,7 @@ class HomeScreen extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.symmetric(
                     horizontal: 12,
-                    vertical: 11,
+                    vertical: 10,
                   ),
                   decoration: BoxDecoration(
                     color: AppColors.background,
@@ -158,13 +173,16 @@ class HomeScreen extends StatelessWidget {
                         color: AppColors.textTertiary,
                       ),
                       const SizedBox(width: 12),
-                      Text(
-                        'Search yoga, gym, spa...',
-                        style: TextStyle(
-                          color: AppColors.textTertiary,
-                          fontSize: 14,
-                          fontWeight: FontWeight.w400,
-                          height: 1.43,
+                      Expanded(
+                        child: Text(
+                          'Search yoga, gym, spa...',
+                          style: TextStyle(
+                            color: AppColors.textTertiary,
+                            fontSize: 14,
+                            fontWeight: FontWeight.w400,
+                            height: 1.33,
+                          ),
+                          overflow: TextOverflow.ellipsis,
                         ),
                       ),
                     ],
@@ -183,14 +201,15 @@ class HomeScreen extends StatelessWidget {
                   child: Stack(
                     children: [
                       Padding(
-                        padding: const EdgeInsets.all(20),
+                        padding: const EdgeInsets.all(16),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisSize: MainAxisSize.min,
                           children: [
                             Container(
                               padding: const EdgeInsets.symmetric(
-                                horizontal: 12,
-                                vertical: 6,
+                                horizontal: 10,
+                                vertical: 4,
                               ),
                               decoration: BoxDecoration(
                                 color: Colors.white.withValues(alpha: 0.25),
@@ -200,9 +219,9 @@ class HomeScreen extends StatelessWidget {
                                 'LIMITED OFFER',
                                 style: TextStyle(
                                   color: Colors.white,
-                                  fontSize: 12,
+                                  fontSize: 10,
                                   fontWeight: FontWeight.w700,
-                                  height: 1.38,
+                                  height: 1.33,
                                   letterSpacing: 0.50,
                                 ),
                               ),
@@ -214,19 +233,22 @@ class HomeScreen extends StatelessWidget {
                                 color: Colors.white,
                                 fontSize: 18,
                                 fontWeight: FontWeight.w800,
-                                height: 1.50,
+                                height: 1.33,
                                 letterSpacing: -0.30,
                               ),
+                              overflow: TextOverflow.ellipsis,
                             ),
                             const SizedBox(height: 4),
                             Text(
                               'Try Pro plan at no cost. Unlock 40 classes.',
                               style: TextStyle(
                                 color: Colors.white.withValues(alpha: 0.85),
-                                fontSize: 12,
+                                fontSize: 11,
                                 fontWeight: FontWeight.w400,
-                                height: 1.50,
+                                height: 1.33,
                               ),
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
                             ),
                             const Spacer(),
                             Container(
@@ -248,7 +270,7 @@ class HomeScreen extends StatelessWidget {
                                       color: AppColors.primaryDark,
                                       fontSize: 12,
                                       fontWeight: FontWeight.w500,
-                                      height: 1.50,
+                                      height: 1.33,
                                     ),
                                   ),
                                   const SizedBox(width: 4),
@@ -298,15 +320,15 @@ class HomeScreen extends StatelessWidget {
                   scrollDirection: Axis.horizontal,
                   child: Row(
                     children: const [
-                      _CategoryCard(icon: Icons.self_improvement, label: 'Yoga'),
+                      _CategoryCard(imagePath: 'assets/Yoga.png', label: 'Yoga'),
                       SizedBox(width: 8),
-                      _CategoryCard(icon: Icons.fitness_center, label: 'Pilates'),
+                      _CategoryCard(imagePath: 'assets/Pilates.png', label: 'Pilates'),
                       SizedBox(width: 8),
-                      _CategoryCard(icon: Icons.sports_gymnastics, label: 'Gym'),
+                      _CategoryCard(imagePath: 'assets/Gym.png', label: 'Gym'),
                       SizedBox(width: 8),
-                      _CategoryCard(icon: Icons.spa, label: 'Spa'),
+                      _CategoryCard(imagePath: 'assets/Spa.png', label: 'Spa'),
                       SizedBox(width: 8),
-                      _CategoryCard(icon: Icons.spa_outlined, label: 'Massage'),
+                      _CategoryCard(imagePath: 'assets/reformer.png', label: 'Reformer'),
                     ],
                   ),
                 ),
@@ -348,6 +370,7 @@ class HomeScreen extends StatelessWidget {
                         rating: 4.9,
                         credits: '2-3 cr',
                         distance: '0.5 km',
+                        imagePath: 'assets/ZenFlowStudio.png',
                         onTap: () {
                           Navigator.pushNamed(context, AppRoutes.studioDetails);
                         },
@@ -359,6 +382,7 @@ class HomeScreen extends StatelessWidget {
                         rating: 4.9,
                         credits: '1-2 cr',
                         distance: '1.2 km',
+                        imagePath: 'assets/FitForseGym.png',
                         onTap: () {
                           Navigator.pushNamed(context, AppRoutes.studioDetails);
                         },
@@ -370,6 +394,7 @@ class HomeScreen extends StatelessWidget {
                         rating: 4.9,
                         credits: '1-2 cr',
                         distance: '1.2 km',
+                        imagePath: 'assets/FitforceGym2.png',
                         onTap: () {
                           Navigator.pushNamed(context, AppRoutes.studioDetails);
                         },
@@ -411,6 +436,7 @@ class HomeScreen extends StatelessWidget {
                   time: '07:00 AM',
                   credits: '2 cr',
                   spotsLeft: '4 spots left',
+                  imagePath: 'assets/Morning.png',
                   onTap: () {
                     Navigator.pushNamed(context, AppRoutes.classDetails);
                   },
@@ -422,6 +448,7 @@ class HomeScreen extends StatelessWidget {
                   time: '06:30 PM',
                   credits: '3 cr',
                   spotsLeft: 'Full',
+                  imagePath: 'assets/Kickboxing.png',
                   onTap: () {
                     Navigator.pushNamed(context, AppRoutes.classDetails);
                   },
@@ -433,6 +460,7 @@ class HomeScreen extends StatelessWidget {
                   time: '12:00 PM',
                   credits: '3 cr',
                   spotsLeft: '2 spots left',
+                  imagePath: 'assets/reformer.png',
                   onTap: () {
                     Navigator.pushNamed(context, AppRoutes.classDetails);
                   },
@@ -443,18 +471,18 @@ class HomeScreen extends StatelessWidget {
           ),
         ),
       ),
-      bottomNavigationBar: const _BottomNavBar(currentIndex: 0),
+      bottomNavigationBar: const CustomBottomNavBar(currentIndex: 0),
     );
   }
 }
 
 
 class _CategoryCard extends StatelessWidget {
-  final IconData icon;
+  final String imagePath;
   final String label;
 
   const _CategoryCard({
-    required this.icon,
+    required this.imagePath,
     required this.label,
   });
 
@@ -474,10 +502,14 @@ class _CategoryCard extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(
-            icon,
-            size: 24,
-            color: AppColors.primary,
+          ClipRRect(
+            borderRadius: BorderRadius.circular(8),
+            child: Image.asset(
+              imagePath,
+              width: 40,
+              height: 40,
+              fit: BoxFit.cover,
+            ),
           ),
           const SizedBox(height: 8),
           Text(
@@ -503,6 +535,7 @@ class _StudioCard extends StatelessWidget {
   final double rating;
   final String credits;
   final String distance;
+  final String imagePath;
   final VoidCallback onTap;
 
   const _StudioCard({
@@ -511,6 +544,7 @@ class _StudioCard extends StatelessWidget {
     required this.rating,
     required this.credits,
     required this.distance,
+    required this.imagePath,
     required this.onTap,
   });
 
@@ -541,7 +575,10 @@ class _StudioCard extends StatelessWidget {
               height: 110,
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
               decoration: BoxDecoration(
-                color: Colors.grey[300],
+                image: DecorationImage(
+                  image: AssetImage(imagePath),
+                  fit: BoxFit.cover,
+                ),
               ),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.start,
@@ -646,6 +683,7 @@ class _ClassListItem extends StatelessWidget {
   final String time;
   final String credits;
   final String spotsLeft;
+  final String imagePath;
   final VoidCallback onTap;
 
   const _ClassListItem({
@@ -654,6 +692,7 @@ class _ClassListItem extends StatelessWidget {
     required this.time,
     required this.credits,
     required this.spotsLeft,
+    required this.imagePath,
     required this.onTap,
   });
 
@@ -683,8 +722,11 @@ class _ClassListItem extends StatelessWidget {
               height: 70,
               clipBehavior: Clip.antiAlias,
               decoration: BoxDecoration(
-                color: const Color(0xFFE1E3DF),
                 borderRadius: BorderRadius.circular(8),
+                image: DecorationImage(
+                  image: AssetImage(imagePath),
+                  fit: BoxFit.cover,
+                ),
               ),
             ),
             const SizedBox(width: 16),
@@ -759,142 +801,6 @@ class _ClassListItem extends StatelessWidget {
                     ],
                   ),
                 ],
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-
-class _BottomNavBar extends StatelessWidget {
-  final int currentIndex;
-
-  const _BottomNavBar({required this.currentIndex});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.all(20),
-      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 8),
-      decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.10),
-        borderRadius: BorderRadius.circular(32),
-        boxShadow: [
-          BoxShadow(
-            color: Color(0x0C000000),
-            blurRadius: 6,
-            offset: Offset(0, 3),
-            spreadRadius: 0,
-          ),
-        ],
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          _NavItem(
-            icon: Icons.home_outlined,
-            activeIcon: Icons.home,
-            label: 'Home',
-            isActive: currentIndex == 0,
-            onTap: () {},
-          ),
-          _NavItem(
-            icon: Icons.search,
-            activeIcon: Icons.search,
-            label: 'Search',
-            isActive: currentIndex == 1,
-            onTap: () {
-              Navigator.pushNamed(context, AppRoutes.search);
-            },
-          ),
-          _NavItem(
-            icon: Icons.calendar_today_outlined,
-            activeIcon: Icons.calendar_today,
-            label: 'Bookings',
-            isActive: currentIndex == 2,
-            onTap: () {
-              Navigator.pushNamed(context, AppRoutes.bookings);
-            },
-          ),
-          _NavItem(
-            icon: Icons.favorite_outline,
-            activeIcon: Icons.favorite,
-            label: 'Favorites',
-            isActive: currentIndex == 3,
-            onTap: () {
-              Navigator.pushNamed(context, AppRoutes.favorites);
-            },
-          ),
-          _NavItem(
-            icon: Icons.person_outline,
-            activeIcon: Icons.person,
-            label: 'Profile',
-            isActive: currentIndex == 4,
-            onTap: () {
-              Navigator.pushNamed(context, AppRoutes.profile);
-            },
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _NavItem extends StatelessWidget {
-  final IconData icon;
-  final IconData activeIcon;
-  final String label;
-  final bool isActive;
-  final VoidCallback onTap;
-
-  const _NavItem({
-    required this.icon,
-    required this.activeIcon,
-    required this.label,
-    required this.isActive,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-        decoration: BoxDecoration(
-          color: isActive ? const Color(0xFFDFDFDF) : Colors.transparent,
-          borderRadius: BorderRadius.circular(32),
-          boxShadow: isActive
-              ? [
-                  BoxShadow(
-                    color: Color(0x0F000000),
-                    blurRadius: 10,
-                    offset: Offset(0, 0),
-                    spreadRadius: 0,
-                  ),
-                ]
-              : null,
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              isActive ? activeIcon : icon,
-              size: 20,
-              color: AppColors.textDark,
-            ),
-            const SizedBox(height: 4),
-            Text(
-              label,
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                color: AppColors.textDark,
-                fontSize: 10,
-                fontWeight: FontWeight.w400,
-                height: 1.20,
               ),
             ),
           ],
