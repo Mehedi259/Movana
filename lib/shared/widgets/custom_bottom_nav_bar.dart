@@ -28,62 +28,72 @@ class CustomBottomNavBar extends StatelessWidget {
         ],
       ),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
-          _NavItem(
-            icon: Icons.home_outlined,
-            activeIcon: Icons.home,
-            label: 'Home',
-            isActive: currentIndex == 0,
-            onTap: () {
-              if (currentIndex != 0) {
-                Navigator.pushReplacementNamed(context, AppRoutes.home);
-              }
-            },
+          Expanded(
+            child: _NavItem(
+              icon: Icons.home_outlined,
+              activeIcon: Icons.home,
+              label: 'Home',
+              isActive: currentIndex == 0,
+              onTap: () {
+                if (currentIndex != 0) {
+                  Navigator.pushReplacementNamed(context, AppRoutes.home);
+                }
+              },
+            ),
           ),
-          _NavItem(
-            icon: Icons.search,
-            activeIcon: Icons.search,
-            label: 'Search',
-            isActive: currentIndex == 1,
-            onTap: () {
-              if (currentIndex != 1) {
-                Navigator.pushReplacementNamed(context, AppRoutes.search);
-              }
-            },
+          Expanded(
+            child: _NavItem(
+              icon: Icons.search,
+              activeIcon: Icons.search,
+              label: 'Search',
+              isActive: currentIndex == 1,
+              onTap: () {
+                if (currentIndex != 1) {
+                  Navigator.pushReplacementNamed(context, AppRoutes.search);
+                }
+              },
+            ),
           ),
-          _NavItem(
-            icon: Icons.calendar_today_outlined,
-            activeIcon: Icons.calendar_today,
-            label: 'Bookings',
-            isActive: currentIndex == 2,
-            onTap: () {
-              if (currentIndex != 2) {
-                Navigator.pushReplacementNamed(context, AppRoutes.bookings);
-              }
-            },
+          Expanded(
+            child: _NavItem(
+              icon: Icons.calendar_today_outlined,
+              activeIcon: Icons.calendar_today,
+              label: 'Bookings',
+              isActive: currentIndex == 2,
+              onTap: () {
+                if (currentIndex != 2) {
+                  Navigator.pushReplacementNamed(context, AppRoutes.bookings);
+                }
+              },
+            ),
           ),
-          _NavItem(
-            icon: Icons.favorite_outline,
-            activeIcon: Icons.favorite,
-            label: 'Favorites',
-            isActive: currentIndex == 3,
-            onTap: () {
-              if (currentIndex != 3) {
-                Navigator.pushReplacementNamed(context, AppRoutes.favorites);
-              }
-            },
+          Expanded(
+            child: _NavItem(
+              icon: Icons.favorite_outline,
+              activeIcon: Icons.favorite,
+              label: 'Favorites',
+              isActive: currentIndex == 3,
+              onTap: () {
+                if (currentIndex != 3) {
+                  Navigator.pushReplacementNamed(context, AppRoutes.favorites);
+                }
+              },
+            ),
           ),
-          _NavItem(
-            icon: Icons.person_outline,
-            activeIcon: Icons.person,
-            label: 'Profile',
-            isActive: currentIndex == 4,
-            onTap: () {
-              if (currentIndex != 4) {
-                Navigator.pushReplacementNamed(context, AppRoutes.profile);
-              }
-            },
+          Expanded(
+            child: _NavItem(
+              icon: Icons.person_outline,
+              activeIcon: Icons.person,
+              label: 'Profile',
+              isActive: currentIndex == 4,
+              onTap: () {
+                if (currentIndex != 4) {
+                  Navigator.pushReplacementNamed(context, AppRoutes.profile);
+                }
+              },
+            ),
           ),
         ],
       ),
@@ -111,7 +121,7 @@ class _NavItem extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
         decoration: BoxDecoration(
           color: isActive ? const Color(0xFFDFDFDF) : Colors.transparent,
           borderRadius: BorderRadius.circular(32),
@@ -134,13 +144,13 @@ class _NavItem extends StatelessWidget {
               size: 20,
               color: AppColors.textDark,
             ),
-            const SizedBox(height: 4),
+            const SizedBox(height: 2),
             Text(
               label,
               textAlign: TextAlign.center,
               style: TextStyle(
                 color: AppColors.textDark,
-                fontSize: 10,
+                fontSize: 9,
                 fontWeight: FontWeight.w400,
                 height: 1.20,
               ),
