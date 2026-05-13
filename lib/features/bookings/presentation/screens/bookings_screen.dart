@@ -44,38 +44,30 @@ class _BookingsScreenState extends State<BookingsScreen> {
             // Tab Bar
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 26),
-              child: Container(
-                decoration: BoxDecoration(
-                  border: Border.all(
-                    width: 1,
-                    color: const Color(0xFFE1E3DF),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: _TabItem(
+                      label: 'Upcoming',
+                      isSelected: _selectedTab == 0,
+                      onTap: () => setState(() => _selectedTab = 0),
+                    ),
                   ),
-                ),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: _TabItem(
-                        label: 'Upcoming',
-                        isSelected: _selectedTab == 0,
-                        onTap: () => setState(() => _selectedTab = 0),
-                      ),
+                  Expanded(
+                    child: _TabItem(
+                      label: 'Past',
+                      isSelected: _selectedTab == 1,
+                      onTap: () => setState(() => _selectedTab = 1),
                     ),
-                    Expanded(
-                      child: _TabItem(
-                        label: 'Past',
-                        isSelected: _selectedTab == 1,
-                        onTap: () => setState(() => _selectedTab = 1),
-                      ),
+                  ),
+                  Expanded(
+                    child: _TabItem(
+                      label: 'Cancelled',
+                      isSelected: _selectedTab == 2,
+                      onTap: () => setState(() => _selectedTab = 2),
                     ),
-                    Expanded(
-                      child: _TabItem(
-                        label: 'Cancelled',
-                        isSelected: _selectedTab == 2,
-                        onTap: () => setState(() => _selectedTab = 2),
-                      ),
-                    ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
             

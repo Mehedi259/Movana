@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import '../../../../core/constants/app_colors.dart';
 
 class ClassScheduleScreen extends StatefulWidget {
   const ClassScheduleScreen({super.key});
@@ -10,138 +9,211 @@ class ClassScheduleScreen extends StatefulWidget {
 
 class _ClassScheduleScreenState extends State<ClassScheduleScreen> {
   String _selectedDay = 'All';
-  String _selectedCategory = 'All';
 
   final List<String> _days = ['All', 'Today', 'Tue-28', 'Wed-29', 'Thu-30'];
-  final List<String> _categories = ['All', 'Yoga', 'Pilates', 'Gym', 'HIIT'];
+  final List<String> _categories = ['Yoga', 'Pilates', 'Gym', 'HIIT', 'Spin'];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: const Text('Class Schedule'),
+        backgroundColor: Colors.white,
+        elevation: 0,
+        leading: IconButton(
+          icon: Container(
+            width: 24,
+            height: 24,
+            decoration: BoxDecoration(
+              color: Colors.black.withValues(alpha: 0.10),
+              borderRadius: BorderRadius.circular(100),
+            ),
+            child: const Icon(
+              Icons.arrow_back,
+              size: 16,
+              color: Color(0xFF0B191D),
+            ),
+          ),
+          onPressed: () => Navigator.pop(context),
+        ),
+        title: const Text(
+          'Class Shedule',
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            color: Color(0xFF0B191D),
+            fontSize: 18,
+            fontFamily: 'Nunito Sans',
+            fontWeight: FontWeight.w700,
+            height: 1.11,
+          ),
+        ),
         centerTitle: true,
       ),
       body: Column(
         children: [
+          const SizedBox(height: 8),
           // Day Filter
-          Container(
-            height: 60,
-            padding: const EdgeInsets.symmetric(vertical: 8),
+          SizedBox(
+            height: 50,
             child: ListView.builder(
               scrollDirection: Axis.horizontal,
-              padding: const EdgeInsets.symmetric(horizontal: 16),
+              padding: const EdgeInsets.symmetric(horizontal: 26),
               itemCount: _days.length,
               itemBuilder: (context, index) {
                 final day = _days[index];
                 final isSelected = _selectedDay == day;
                 return Padding(
                   padding: const EdgeInsets.only(right: 8),
-                  child: FilterChip(
-                    label: Text(day),
-                    selected: isSelected,
-                    onSelected: (selected) {
+                  child: GestureDetector(
+                    onTap: () {
                       setState(() {
                         _selectedDay = day;
                       });
                     },
-                    backgroundColor: Colors.white,
-                    selectedColor: AppColors.primary,
-                    labelStyle: TextStyle(
-                      color: isSelected ? Colors.white : AppColors.textPrimary,
-                      fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
-                    ),
-                    side: BorderSide(
-                      color: isSelected ? AppColors.primary : Colors.grey[300]!,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 9,
+                      ),
+                      decoration: BoxDecoration(
+                        color: isSelected
+                            ? const Color(0xFF2D6A4F)
+                            : Colors.white,
+                        border: Border.all(
+                          color: isSelected
+                              ? const Color(0xFF2D6A4F)
+                              : const Color(0xFFBFC9C1),
+                          width: 1,
+                        ),
+                        borderRadius: BorderRadius.circular(9999),
+                      ),
+                      child: Center(
+                        child: Text(
+                          day,
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            color: isSelected
+                                ? Colors.white
+                                : const Color(0xFF404943),
+                            fontSize: 14,
+                            fontFamily: 'Lexend',
+                            fontWeight: FontWeight.w400,
+                            height: 1.43,
+                          ),
+                        ),
+                      ),
                     ),
                   ),
                 );
               },
             ),
           ),
+          const SizedBox(height: 16),
           // Category Filter
-          Container(
-            height: 60,
-            padding: const EdgeInsets.symmetric(vertical: 8),
+          SizedBox(
+            height: 50,
             child: ListView.builder(
               scrollDirection: Axis.horizontal,
-              padding: const EdgeInsets.symmetric(horizontal: 16),
+              padding: const EdgeInsets.symmetric(horizontal: 26),
               itemCount: _categories.length,
               itemBuilder: (context, index) {
                 final category = _categories[index];
-                final isSelected = _selectedCategory == category;
                 return Padding(
-                  padding: const EdgeInsets.only(right: 8),
-                  child: FilterChip(
-                    label: Text(category),
-                    selected: isSelected,
-                    onSelected: (selected) {
-                      setState(() {
-                        _selectedCategory = category;
-                      });
+                  padding: const EdgeInsets.only(right: 10),
+                  child: GestureDetector(
+                    onTap: () {
+                      // Category filter action
                     },
-                    backgroundColor: Colors.white,
-                    selectedColor: AppColors.primary,
-                    labelStyle: TextStyle(
-                      color: isSelected ? Colors.white : AppColors.textPrimary,
-                      fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
-                    ),
-                    side: BorderSide(
-                      color: isSelected ? AppColors.primary : Colors.grey[300]!,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 6,
+                      ),
+                      decoration: BoxDecoration(
+                        border: Border.all(
+                          color: const Color(0xFFBFC9C1),
+                          width: 1,
+                        ),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Center(
+                        child: Text(
+                          category,
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(
+                            color: Color(0xFF191C1A),
+                            fontSize: 16,
+                            fontFamily: 'Lexend',
+                            fontWeight: FontWeight.w400,
+                            height: 1.50,
+                          ),
+                        ),
+                      ),
                     ),
                   ),
                 );
               },
             ),
           ),
+          const SizedBox(height: 16),
           // Class List
           Expanded(
             child: ListView(
-              padding: const EdgeInsets.all(16),
-              children: [
+              padding: const EdgeInsets.symmetric(horizontal: 26),
+              children: const [
                 _ClassCard(
                   title: 'Vinyasa Flow Power Hour',
                   studio: 'Zen Studio',
                   instructor: 'Sarah Jenkins',
-                  time: 'Today, 08:00 AM - 08:50 AM',
+                  time: 'Today, 08:00 AM – 08:50 AM',
                   credits: 2,
                   category: 'Yoga',
                   spotsLeft: 4,
-                  imageColor: Colors.pink[100]!,
+                  imagePath: 'assets/Vinyasa Flow Power Hour.png',
                 ),
-                const SizedBox(height: 12),
+                SizedBox(height: 8),
                 _ClassCard(
                   title: 'Core Reformer Essentials',
                   studio: 'Core Space',
                   instructor: 'Marcus Lin',
-                  time: 'Today, 09:30 AM - 10:20 AM',
+                  time: 'Today, 09:30 AM – 10:20 AM',
                   credits: 3,
                   category: 'Pilates',
                   isWaitlist: true,
-                  imageColor: Colors.grey[300]!,
+                  imagePath: 'assets/Core Reformer Essentials.png',
                 ),
-                const SizedBox(height: 12),
+                SizedBox(height: 8),
                 _ClassCard(
                   title: 'Full Body HIIT Burn',
                   studio: 'Iron & Sweat',
                   instructor: 'Coach T',
-                  time: 'Today, 12:15 PM - 13:00 PM',
+                  time: 'Today, 12:15 PM – 13:00 PM',
                   credits: 3,
                   category: 'HIIT',
                   isWaitlist: true,
-                  imageColor: Colors.orange[200]!,
+                  imagePath: 'assets/Full Body HIIT Burn.png',
                 ),
-                const SizedBox(height: 12),
+                SizedBox(height: 8),
                 _ClassCard(
                   title: 'Vinyasa Flow Power Hour',
                   studio: 'Zen Studio',
                   instructor: 'Sarah Jenkins',
-                  time: 'Today, 08:00 AM - 08:50 AM',
+                  time: 'Today, 08:00 AM – 08:50 AM',
                   credits: 2,
                   category: 'Yoga',
                   spotsLeft: 4,
-                  imageColor: Colors.pink[100]!,
+                  imagePath: 'assets/Vinyasa Flow Power Hour.png',
+                ),
+                SizedBox(height: 8),
+                _ClassCard(
+                  title: 'Core Reformer Essentials',
+                  studio: 'Core Space',
+                  instructor: 'Marcus Lin',
+                  time: 'Today, 09:30 AM – 10:20 AM',
+                  credits: 3,
+                  category: 'Pilates',
+                  isWaitlist: true,
+                  imagePath: 'assets/Core Reformer Essentials.png',
                 ),
               ],
             ),
@@ -161,7 +233,7 @@ class _ClassCard extends StatelessWidget {
   final String category;
   final int? spotsLeft;
   final bool isWaitlist;
-  final Color imageColor;
+  final String imagePath;
 
   const _ClassCard({
     required this.title,
@@ -172,7 +244,7 @@ class _ClassCard extends StatelessWidget {
     required this.category,
     this.spotsLeft,
     this.isWaitlist = false,
-    required this.imageColor,
+    required this.imagePath,
   });
 
   @override
@@ -180,23 +252,32 @@ class _ClassCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: const Color(0xFFF8FAF6),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.grey[200]!),
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x11000000),
+            blurRadius: 12,
+            offset: Offset(0, 2),
+          ),
+        ],
       ),
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Image
           Container(
             width: 80,
             height: 80,
             decoration: BoxDecoration(
-              color: imageColor,
               borderRadius: BorderRadius.circular(8),
+              image: DecorationImage(
+                image: AssetImage(imagePath),
+                fit: BoxFit.cover,
+              ),
             ),
-            child: const Icon(Icons.fitness_center, size: 40),
           ),
-          const SizedBox(width: 12),
+          const SizedBox(width: 16),
           // Details
           Expanded(
             child: Column(
@@ -205,42 +286,53 @@ class _ClassCard extends StatelessWidget {
                 Text(
                   title,
                   style: const TextStyle(
+                    color: Color(0xFF191C1A),
                     fontSize: 16,
-                    fontWeight: FontWeight.bold,
+                    fontFamily: 'Lexend',
+                    fontWeight: FontWeight.w400,
+                    height: 1.50,
                   ),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
-                const SizedBox(height: 4),
+                const SizedBox(height: 2),
                 Text(
-                  '$studio • $instructor',
-                  style: TextStyle(
-                    color: AppColors.textSecondary,
-                    fontSize: 13,
+                  '$studio · $instructor',
+                  style: const TextStyle(
+                    color: Color(0xFF404943),
+                    fontSize: 14,
+                    fontFamily: 'Lexend',
+                    fontWeight: FontWeight.w400,
+                    height: 1.43,
                   ),
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: 6),
                 Row(
                   children: [
-                    Icon(
+                    const Icon(
                       Icons.access_time,
-                      size: 14,
-                      color: AppColors.textSecondary,
+                      size: 16,
+                      color: Color(0xFF404943),
                     ),
                     const SizedBox(width: 4),
                     Expanded(
                       child: Text(
                         time,
-                        style: TextStyle(
-                          color: AppColors.textSecondary,
+                        style: const TextStyle(
+                          color: Color(0xFF404943),
                           fontSize: 12,
+                          fontFamily: 'Lexend',
+                          fontWeight: FontWeight.w400,
+                          height: 1.50,
                         ),
                       ),
                     ),
                   ],
                 ),
-                const SizedBox(height: 8),
-                Row(
+                const SizedBox(height: 6),
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 4,
                   children: [
                     Container(
                       padding: const EdgeInsets.symmetric(
@@ -248,37 +340,43 @@ class _ClassCard extends StatelessWidget {
                         vertical: 4,
                       ),
                       decoration: BoxDecoration(
-                        color: Colors.amber[50],
-                        borderRadius: BorderRadius.circular(12),
+                        color: const Color(0xFFD9E6DA),
+                        borderRadius: BorderRadius.circular(4),
                       ),
                       child: Text(
                         '$credits credits',
                         style: const TextStyle(
-                          fontSize: 11,
-                          fontWeight: FontWeight.w600,
+                          color: Color(0xFF5B675E),
+                          fontSize: 12,
+                          fontFamily: 'Lexend',
+                          fontWeight: FontWeight.w400,
+                          height: 1.50,
                         ),
                       ),
                     ),
-                    const SizedBox(width: 8),
                     Container(
                       padding: const EdgeInsets.symmetric(
                         horizontal: 8,
                         vertical: 4,
                       ),
                       decoration: BoxDecoration(
-                        color: AppColors.primary.withValues(alpha: 0.1),
-                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: const Color(0xFFBFC9C1),
+                          width: 1,
+                        ),
+                        borderRadius: BorderRadius.circular(4),
                       ),
                       child: Text(
                         category,
-                        style: TextStyle(
-                          fontSize: 11,
-                          fontWeight: FontWeight.w600,
-                          color: AppColors.primary,
+                        style: const TextStyle(
+                          color: Color(0xFF404943),
+                          fontSize: 12,
+                          fontFamily: 'Lexend',
+                          fontWeight: FontWeight.w400,
+                          height: 1.50,
                         ),
                       ),
                     ),
-                    const SizedBox(width: 8),
                     if (spotsLeft != null)
                       Container(
                         padding: const EdgeInsets.symmetric(
@@ -286,15 +384,17 @@ class _ClassCard extends StatelessWidget {
                           vertical: 4,
                         ),
                         decoration: BoxDecoration(
-                          color: Colors.red[50],
-                          borderRadius: BorderRadius.circular(12),
+                          color: const Color(0x338D4D4E),
+                          borderRadius: BorderRadius.circular(4),
                         ),
                         child: Text(
                           '$spotsLeft spots left',
                           style: const TextStyle(
-                            fontSize: 11,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.red,
+                            color: Color(0xFF713638),
+                            fontSize: 12,
+                            fontFamily: 'Lexend',
+                            fontWeight: FontWeight.w400,
+                            height: 1.50,
                           ),
                         ),
                       ),
@@ -305,15 +405,17 @@ class _ClassCard extends StatelessWidget {
                           vertical: 4,
                         ),
                         decoration: BoxDecoration(
-                          color: Colors.orange[50],
-                          borderRadius: BorderRadius.circular(12),
+                          color: const Color(0x338D4D4E),
+                          borderRadius: BorderRadius.circular(4),
                         ),
                         child: const Text(
                           'Waitlist',
                           style: TextStyle(
-                            fontSize: 11,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.orange,
+                            color: Color(0xFF713638),
+                            fontSize: 12,
+                            fontFamily: 'Lexend',
+                            fontWeight: FontWeight.w400,
+                            height: 1.50,
                           ),
                         ),
                       ),
