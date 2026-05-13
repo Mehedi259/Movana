@@ -288,7 +288,7 @@ class HomeScreen extends StatelessWidget {
                     ],
                   ),
                 ),
-                const SizedBox(height: 24),
+                const SizedBox(height: 32),
                 // Top Categories
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -327,8 +327,6 @@ class HomeScreen extends StatelessWidget {
                       _CategoryCard(imagePath: 'assets/Gym.png', label: 'Gym'),
                       SizedBox(width: 8),
                       _CategoryCard(imagePath: 'assets/Spa.png', label: 'Spa'),
-                      SizedBox(width: 8),
-                      _CategoryCard(imagePath: 'assets/reformer.png', label: 'Reformer'),
                     ],
                   ),
                 ),
@@ -489,8 +487,8 @@ class _CategoryCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 82,
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+      width: 100,
+      padding: const EdgeInsets.fromLTRB(16, 20, 16, 14),
       decoration: BoxDecoration(
         color: Colors.white,
         border: Border.all(
@@ -502,16 +500,13 @@ class _CategoryCard extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          ClipRRect(
-            borderRadius: BorderRadius.circular(8),
-            child: Image.asset(
-              imagePath,
-              width: 40,
-              height: 40,
-              fit: BoxFit.cover,
-            ),
+          Image.asset(
+            imagePath,
+            width: 36,
+            height: 36,
+            fit: BoxFit.contain,
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 10),
           Text(
             label,
             textAlign: TextAlign.center,
@@ -519,7 +514,7 @@ class _CategoryCard extends StatelessWidget {
               color: AppColors.textDark,
               fontSize: 12,
               fontWeight: FontWeight.w600,
-              height: 1.50,
+              height: 1.40,
             ),
           ),
         ],
