@@ -346,14 +346,17 @@ class _FavoriteStudioCardState extends State<_FavoriteStudioCard> {
                         color: Color(0xFF404943),
                       ),
                       const SizedBox(width: 4),
-                      Text(
-                        '${widget.distance} · ${widget.location}',
-                        style: const TextStyle(
-                          color: Color(0xFF404943),
-                          fontSize: 14,
-                          fontFamily: 'Lexend',
-                          fontWeight: FontWeight.w400,
-                          height: 1.43,
+                      Expanded(
+                        child: Text(
+                          '${widget.distance} · ${widget.location}',
+                          style: const TextStyle(
+                            color: Color(0xFF404943),
+                            fontSize: 14,
+                            fontFamily: 'Lexend',
+                            fontWeight: FontWeight.w400,
+                            height: 1.43,
+                          ),
+                          overflow: TextOverflow.ellipsis,
                         ),
                       ),
                     ],

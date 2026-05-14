@@ -201,14 +201,17 @@ class _ClassDetailsScreenState extends State<ClassDetailsScreen> {
                               },
                               child: Row(
                                 children: [
-                                  const Text(
-                                    'Camden Court · Zen Flow Studio',
-                                    style: TextStyle(
-                                      color: Color(0xFF0F5238),
-                                      fontSize: 16,
-                                      fontFamily: 'Lexend',
-                                      fontWeight: FontWeight.w500,
-                                      height: 1.38,
+                                  const Expanded(
+                                    child: Text(
+                                      'Camden Court · Zen Flow Studio',
+                                      style: TextStyle(
+                                        color: Color(0xFF0F5238),
+                                        fontSize: 16,
+                                        fontFamily: 'Lexend',
+                                        fontWeight: FontWeight.w500,
+                                        height: 1.38,
+                                      ),
+                                      overflow: TextOverflow.ellipsis,
                                     ),
                                   ),
                                   const SizedBox(width: 4),
