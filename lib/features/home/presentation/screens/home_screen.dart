@@ -9,6 +9,7 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      extendBody: true,
       backgroundColor: AppColors.background,
       body: SafeArea(
         child: SingleChildScrollView(
@@ -152,40 +153,45 @@ class HomeScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 16),
                 // Search Bar
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 10,
-                  ),
-                  decoration: BoxDecoration(
-                    color: AppColors.background,
-                    border: Border.all(
-                      width: 1,
-                      color: AppColors.border,
+                GestureDetector(
+                  onTap: () {
+                    Navigator.pushNamed(context, AppRoutes.searchMap);
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 10,
                     ),
-                    borderRadius: BorderRadius.circular(14),
-                  ),
-                  child: Row(
-                    children: [
-                      Icon(
-                        Icons.search,
-                        size: 20,
-                        color: AppColors.textTertiary,
+                    decoration: BoxDecoration(
+                      color: AppColors.background,
+                      border: Border.all(
+                        width: 1,
+                        color: AppColors.border,
                       ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: Text(
-                          'Search yoga, gym, spa...',
-                          style: TextStyle(
-                            color: AppColors.textTertiary,
-                            fontSize: 14,
-                            fontWeight: FontWeight.w400,
-                            height: 1.33,
-                          ),
-                          overflow: TextOverflow.ellipsis,
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                    child: Row(
+                      children: [
+                        Icon(
+                          Icons.search,
+                          size: 20,
+                          color: AppColors.textTertiary,
                         ),
-                      ),
-                    ],
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Text(
+                            'Search yoga, gym, spa...',
+                            style: TextStyle(
+                              color: AppColors.textTertiary,
+                              fontSize: 14,
+                              fontWeight: FontWeight.w400,
+                              height: 1.33,
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
                 const SizedBox(height: 20),
@@ -344,15 +350,20 @@ class HomeScreen extends StatelessWidget {
                         height: 1.38,
                       ),
                     ),
-                    Text(
-                      'Map view',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        color: AppColors.textDark,
-                        fontSize: 10,
-                        fontWeight: FontWeight.w500,
-                        decoration: TextDecoration.underline,
-                        height: 1.60,
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.pushNamed(context, AppRoutes.searchMap);
+                      },
+                      child: Text(
+                        'Map view',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          color: AppColors.textDark,
+                          fontSize: 10,
+                          fontWeight: FontWeight.w500,
+                          decoration: TextDecoration.underline,
+                          height: 1.60,
+                        ),
                       ),
                     ),
                   ],

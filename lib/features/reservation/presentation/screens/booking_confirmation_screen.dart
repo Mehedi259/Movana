@@ -1,63 +1,94 @@
 import 'package:flutter/material.dart';
-import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_routes.dart';
 
-class BookingConfirmationScreen extends StatelessWidget {
+class BookingConfirmationScreen extends StatefulWidget {
   const BookingConfirmationScreen({super.key});
 
+  @override
+  State<BookingConfirmationScreen> createState() => _BookingConfirmationScreenState();
+}
+
+class _BookingConfirmationScreenState extends State<BookingConfirmationScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: const Text('Offer Claimed'),
+        backgroundColor: Colors.white,
+        elevation: 0,
+        title: const Text(
+          'Offer Claimed',
+          style: TextStyle(
+            color: Color(0xFF0B191D),
+            fontSize: 18,
+            fontFamily: 'Nunito Sans',
+            fontWeight: FontWeight.w700,
+          ),
+        ),
         centerTitle: true,
-        automaticallyImplyLeading: false,
+        automaticallyImplyLeading: false, // Usually no back button on success screen
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(20),
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            const SizedBox(height: 40),
+            const SizedBox(height: 16),
             // Success Icon
             Container(
-              width: 120,
-              height: 120,
-              decoration: BoxDecoration(
-                color: AppColors.success,
+              width: 96,
+              height: 96,
+              decoration: const BoxDecoration(
+                color: Color(0xFF2D6A4F),
                 shape: BoxShape.circle,
               ),
-              child: const Icon(
-                Icons.check,
-                size: 60,
-                color: Colors.white,
+              child: Center(
+                child: Container(
+                  width: 44,
+                  height: 44,
+                  decoration: const BoxDecoration(
+                    color: Colors.white,
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(
+                    Icons.check,
+                    size: 28,
+                    color: Color(0xFF2D6A4F),
+                  ),
+                ),
               ),
             ),
-            const SizedBox(height: 32),
+            const SizedBox(height: 24),
+
             // Success Message
             const Text(
               'You\'re Booked! 🎉',
               style: TextStyle(
-                fontSize: 28,
-                fontWeight: FontWeight.bold,
+                color: Color(0xFF2D6A4F),
+                fontSize: 24,
+                fontFamily: 'Lexend',
+                fontWeight: FontWeight.w700,
               ),
             ),
             const SizedBox(height: 12),
-            Text(
+            const Text(
               'See you at Reformer Pilates on Monday, Mar 16\nat 7:00 AM. A confirmation has been sent to\nyour email.',
               textAlign: TextAlign.center,
               style: TextStyle(
-                color: AppColors.textSecondary,
+                color: Color(0xFF404943),
                 fontSize: 14,
+                fontFamily: 'Lexend',
+                fontWeight: FontWeight.w400,
                 height: 1.5,
               ),
             ),
             const SizedBox(height: 32),
+
             // Booking Summary Card
             Container(
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
-                color: AppColors.success.withValues(alpha: 0.1),
+                color: const Color(0xFFDEE5D9),
                 borderRadius: BorderRadius.circular(16),
               ),
               child: Column(
@@ -66,82 +97,92 @@ class BookingConfirmationScreen extends StatelessWidget {
                   const Text(
                     'Booking Summary',
                     style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
+                      color: Color(0xFF0F5238),
+                      fontSize: 16,
+                      fontFamily: 'Lexend',
+                      fontWeight: FontWeight.w600,
                     ),
                   ),
                   const SizedBox(height: 16),
-                  _SummaryRow(
+                  _buildSummaryRow(
                     icon: Icons.fitness_center,
                     label: 'Class',
                     value: 'Reformer Pilates',
                   ),
                   const SizedBox(height: 12),
-                  _SummaryRow(
-                    icon: Icons.location_on,
+                  _buildSummaryRow(
+                    icon: Icons.location_on_outlined,
                     label: 'Studio',
                     value: 'Zen Flow Studio',
                   ),
                   const SizedBox(height: 12),
-                  _SummaryRow(
-                    icon: Icons.person,
+                  _buildSummaryRow(
+                    icon: Icons.person_outline,
                     label: 'Instructor',
                     value: 'Giovanna',
                   ),
-                  const SizedBox(height: 12),
-                  _SummaryRow(
-                    icon: Icons.calendar_today,
+                  const SizedBox(height: 16),
+                  _buildSummaryRow(
+                    icon: Icons.calendar_today_outlined,
                     label: 'Date & Time',
-                    value: 'Mon, Mar 16\n7:00 - 7:50 AM',
+                    value: 'Mon, Mar 16\n7:00 – 7:50 AM',
                   ),
-                  const Divider(height: 32),
+                  const SizedBox(height: 16),
+                  const Divider(color: Color(0xFFBFC9C1), height: 1),
+                  const SizedBox(height: 16),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
+                    children: const [
                       Text(
                         'Credits Used',
                         style: TextStyle(
-                          color: AppColors.textSecondary,
+                          color: Color(0xFF404943),
                           fontSize: 14,
+                          fontFamily: 'Lexend',
+                          fontWeight: FontWeight.w400,
                         ),
                       ),
-                      const Text(
+                      Text(
                         '-02 credits',
                         style: TextStyle(
+                          color: Color(0xFF93000A),
                           fontSize: 14,
+                          fontFamily: 'Lexend',
                           fontWeight: FontWeight.w600,
-                          color: Colors.red,
                         ),
                       ),
                     ],
                   ),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: 12),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Row(
-                        children: [
+                        children: const [
                           Icon(
-                            Icons.account_balance_wallet,
-                            size: 16,
-                            color: AppColors.textSecondary,
+                            Icons.account_balance_wallet_outlined,
+                            size: 18,
+                            color: Color(0xFF0F5238),
                           ),
-                          const SizedBox(width: 8),
+                          SizedBox(width: 8),
                           Text(
                             'New Balance',
                             style: TextStyle(
-                              color: AppColors.textSecondary,
+                              color: Color(0xFF404943),
                               fontSize: 14,
+                              fontFamily: 'Lexend',
+                              fontWeight: FontWeight.w400,
                             ),
                           ),
                         ],
                       ),
-                      Text(
+                      const Text(
                         '100 credits',
                         style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          color: AppColors.success,
+                          color: Color(0xFF0F5238),
+                          fontSize: 14,
+                          fontFamily: 'Lexend',
+                          fontWeight: FontWeight.w600,
                         ),
                       ),
                     ],
@@ -149,88 +190,119 @@ class BookingConfirmationScreen extends StatelessWidget {
                 ],
               ),
             ),
-            const SizedBox(height: 32),
+            const SizedBox(height: 24),
+
             // Location Card
-            const Align(
-              alignment: Alignment.centerLeft,
-              child: Text(
-                'Location',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-            const SizedBox(height: 16),
             Container(
-              height: 150,
+              padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
-                color: Colors.grey[200],
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Center(
-                child: Icon(
-                  Icons.map,
-                  size: 60,
-                  color: Colors.grey[400],
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(
+                  color: const Color(0xFFF3F4F6),
+                  width: 1,
                 ),
+                boxShadow: const [
+                  BoxShadow(
+                    color: Color(0x0A000000),
+                    blurRadius: 12,
+                    offset: Offset(0, 2),
+                  ),
+                ],
               ),
-            ),
-            const SizedBox(height: 16),
-            Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: Colors.grey[50],
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: Colors.grey[200]!),
-              ),
-              child: Row(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text(
-                          'Elevate Studio - Westside',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          '123 Wellness Way',
-                          style: TextStyle(
-                            color: AppColors.textSecondary,
-                            fontSize: 14,
-                          ),
-                        ),
-                        Text(
-                          'Los Angeles, CA 90025',
-                          style: TextStyle(
-                            color: AppColors.textSecondary,
-                            fontSize: 14,
-                          ),
-                        ),
-                      ],
+                  const Text(
+                    'Location',
+                    style: TextStyle(
+                      color: Color(0xFF191C1A),
+                      fontSize: 16,
+                      fontFamily: 'Lexend',
+                      fontWeight: FontWeight.w700,
                     ),
                   ),
+                  const SizedBox(height: 16),
+                  // Google Map Integration
                   Container(
-                    padding: const EdgeInsets.all(12),
+                    width: double.infinity,
+                    height: 120,
+                    clipBehavior: Clip.antiAlias,
                     decoration: BoxDecoration(
-                      color: AppColors.success.withValues(alpha: 0.1),
-                      shape: BoxShape.circle,
+                      color: const Color(0xFFE5E7EB),
+                      borderRadius: BorderRadius.circular(12),
                     ),
-                    child: Icon(
-                      Icons.directions,
-                      color: AppColors.success,
+                    child: Image.asset(
+                      'assets/map.png',
+                      fit: BoxFit.cover,
                     ),
+                  ),
+                  const SizedBox(height: 16),
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: const [
+                            Text(
+                              'Elevate Studio - Westside',
+                              style: TextStyle(
+                                color: Color(0xFF191C1A),
+                                fontSize: 14,
+                                fontFamily: 'Lexend',
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                            SizedBox(height: 4),
+                            Text(
+                              '123 Wellness Way\nLos Angeles, CA 90025',
+                              style: TextStyle(
+                                color: Color(0xFF404943),
+                                fontSize: 13,
+                                fontFamily: 'Lexend',
+                                fontWeight: FontWeight.w400,
+                                height: 1.5,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Column(
+                        children: [
+                          Container(
+                            width: 44,
+                            height: 44,
+                            decoration: const BoxDecoration(
+                              color: Color(0xFFE7E9E5),
+                              shape: BoxShape.circle,
+                            ),
+                            child: const Icon(
+                              Icons.navigation_outlined,
+                              color: Color(0xFF0F5238),
+                              size: 22,
+                            ),
+                          ),
+                          const SizedBox(height: 6),
+                          const Text(
+                            'Directions',
+                            style: TextStyle(
+                              color: Color(0xFF0F5238),
+                              fontSize: 10,
+                              fontFamily: 'Lexend',
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
                   ),
                 ],
               ),
             ),
             const SizedBox(height: 32),
-            // View My Bookings Button
+
+            // Buttons
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
@@ -238,128 +310,120 @@ class BookingConfirmationScreen extends StatelessWidget {
                   Navigator.pushNamed(context, AppRoutes.bookings);
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.primary,
+                  backgroundColor: const Color(0xFF006B3D), // Dark green
                   padding: const EdgeInsets.symmetric(vertical: 16),
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: BorderRadius.circular(100),
                   ),
+                  elevation: 0,
                 ),
                 child: const Text(
                   'View My Bookings',
                   style: TextStyle(
-                    fontSize: 16,
+                    color: Colors.white,
+                    fontSize: 15,
+                    fontFamily: 'Lexend',
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(height: 8),
+            SizedBox(
+              width: double.infinity,
+              child: TextButton(
+                onPressed: () {
+                  Navigator.pushNamedAndRemoveUntil(
+                    context,
+                    AppRoutes.home,
+                    (route) => false,
+                  );
+                },
+                style: TextButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(100),
+                  ),
+                ),
+                child: const Text(
+                  'Back to Home',
+                  style: TextStyle(
+                    color: Color(0xFF0F5238),
+                    fontSize: 15,
+                    fontFamily: 'Lexend',
                     fontWeight: FontWeight.w600,
                   ),
                 ),
               ),
             ),
-            const SizedBox(height: 12),
-            // Back to Home Button
-            TextButton(
-              onPressed: () {
-                Navigator.pushNamedAndRemoveUntil(
-                  context,
-                  AppRoutes.home,
-                  (route) => false,
-                );
-              },
-              child: Text(
-                'Back to Home',
-                style: TextStyle(
-                  color: AppColors.primary,
-                  fontSize: 16,
-                ),
-              ),
-            ),
-            const SizedBox(height: 12),
-            // Cancel Booking Button
-            TextButton(
-              onPressed: () {
-                showDialog(
-                  context: context,
-                  builder: (context) => AlertDialog(
-                    title: const Text('Cancel Booking?'),
-                    content: const Text(
-                      'Are you sure you want to cancel this booking? Your credits will be refunded according to the cancellation policy.',
-                    ),
-                    actions: [
-                      TextButton(
-                        onPressed: () => Navigator.pop(context),
-                        child: const Text('No, Keep It'),
-                      ),
-                      TextButton(
-                        onPressed: () {
-                          Navigator.pop(context);
-                          Navigator.pushNamedAndRemoveUntil(
-                            context,
-                            AppRoutes.home,
-                            (route) => false,
-                          );
-                        },
-                        child: const Text(
-                          'Yes, Cancel',
-                          style: TextStyle(color: Colors.red),
-                        ),
-                      ),
-                    ],
+            SizedBox(
+              width: double.infinity,
+              child: TextButton(
+                onPressed: () {
+                  // Cancel logic
+                },
+                style: TextButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(100),
                   ),
-                );
-              },
-              child: const Text(
-                'Cancel Booking',
-                style: TextStyle(
-                  color: Colors.red,
-                  fontSize: 16,
+                ),
+                child: const Text(
+                  'Cancel Booking',
+                  style: TextStyle(
+                    color: Color(0xFFB3261E),
+                    fontSize: 15,
+                    fontFamily: 'Lexend',
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
               ),
             ),
-            const SizedBox(height: 40),
+            const SizedBox(height: 24),
           ],
         ),
       ),
     );
   }
-}
 
-class _SummaryRow extends StatelessWidget {
-  final IconData icon;
-  final String label;
-  final String value;
-
-  const _SummaryRow({
-    required this.icon,
-    required this.label,
-    required this.value,
-  });
-
-  @override
-  Widget build(BuildContext context) {
+  Widget _buildSummaryRow({
+    required IconData icon,
+    required String label,
+    required String value,
+  }) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Icon(
           icon,
-          size: 20,
-          color: AppColors.textSecondary,
+          size: 18,
+          color: const Color(0xFF0F5238),
         ),
         const SizedBox(width: 12),
         Expanded(
-          child: Column(
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
                 label,
-                style: TextStyle(
-                  color: AppColors.textSecondary,
-                  fontSize: 12,
+                style: const TextStyle(
+                  color: Color(0xFF404943),
+                  fontSize: 14,
+                  fontFamily: 'Lexend',
+                  fontWeight: FontWeight.w400,
                 ),
               ),
-              const SizedBox(height: 2),
-              Text(
-                value,
-                style: const TextStyle(
-                  fontSize: 15,
-                  fontWeight: FontWeight.w600,
+              Expanded(
+                child: Text(
+                  value,
+                  textAlign: TextAlign.right,
+                  style: const TextStyle(
+                    color: Color(0xFF191C1A),
+                    fontSize: 14,
+                    fontFamily: 'Lexend',
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
               ),
             ],

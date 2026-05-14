@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import '../../../../core/constants/app_colors.dart';
 
 class SearchMapScreen extends StatefulWidget {
   const SearchMapScreen({super.key});
@@ -9,7 +8,10 @@ class SearchMapScreen extends StatefulWidget {
 }
 
 class _SearchMapScreenState extends State<SearchMapScreen> {
+  String _selectedTopCategory = 'All';
   String _selectedDay = 'All';
+
+  final List<String> _topCategories = ['All', 'Yoga', 'Gym', 'Pilates', 'Spa', 'Sauna'];
   final List<String> _days = ['All', 'Today', 'Tue-28', 'Wed-29', 'Thu-30'];
 
   void _showFilters() {
@@ -24,91 +26,60 @@ class _SearchMapScreenState extends State<SearchMapScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color(0xFFF9FAFB),
       body: Stack(
         children: [
-          // Map Placeholder
-          Container(
-            color: Colors.grey[200],
-            child: Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    Icons.map,
-                    size: 100,
-                    color: Colors.grey[400],
-                  ),
-                  const SizedBox(height: 16),
-                  Text(
-                    'Map View',
-                    style: TextStyle(
-                      fontSize: 18,
-                      color: Colors.grey[600],
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    '(Map integration required)',
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: Colors.grey[500],
-                    ),
-                  ),
-                ],
-              ),
+          // 1. Google Map
+          Positioned(
+            top: 0,
+            left: 0,
+            right: 0,
+            height: MediaQuery.of(context).size.height * 0.6,
+            child: Image.asset(
+              'assets/map.png',
+              fit: BoxFit.cover,
             ),
           ),
-          // Map Markers (simulated)
+
+          // 2. Search Bar
           Positioned(
-            top: 200,
-            left: 50,
-            child: _MapMarker(number: 1),
-          ),
-          Positioned(
-            top: 150,
-            right: 80,
-            child: _MapMarker(number: 2),
-          ),
-          Positioned(
-            bottom: 400,
-            left: 100,
-            child: _MapMarker(number: 1),
-          ),
-          Positioned(
-            bottom: 450,
-            right: 50,
-            child: _MapMarker(number: 1),
-          ),
-          // Top Search Bar
-          Positioned(
-            top: 50,
+            top: 60,
             left: 16,
             right: 16,
             child: Row(
               children: [
                 Expanded(
                   child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    height: 52,
                     decoration: BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(12),
-                      boxShadow: [
+                      boxShadow: const [
                         BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.1),
+                          color: Color(0x1A000000),
                           blurRadius: 10,
-                          offset: const Offset(0, 2),
+                          offset: Offset(0, 4),
                         ),
                       ],
                     ),
                     child: Row(
                       children: [
-                        Icon(Icons.search, color: Colors.grey[400]),
+                        const SizedBox(width: 16),
+                        const Icon(
+                          Icons.search,
+                          color: Color(0xFF9CA3AF),
+                          size: 22,
+                        ),
                         const SizedBox(width: 12),
                         Expanded(
                           child: TextField(
-                            decoration: InputDecoration(
+                            decoration: const InputDecoration(
                               hintText: 'Search by studio or yoga,gym,spa...',
-                              hintStyle: TextStyle(color: Colors.grey[400]),
+                              hintStyle: TextStyle(
+                                color: Color(0xFF9CA3AF),
+                                fontSize: 14,
+                                fontFamily: 'Lexend',
+                              ),
                               border: InputBorder.none,
                             ),
                           ),
@@ -121,53 +92,70 @@ class _SearchMapScreenState extends State<SearchMapScreen> {
                 GestureDetector(
                   onTap: _showFilters,
                   child: Container(
-                    padding: const EdgeInsets.all(12),
+                    width: 52,
+                    height: 52,
                     decoration: BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(12),
-                      boxShadow: [
+                      boxShadow: const [
                         BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.1),
+                          color: Color(0x1A000000),
                           blurRadius: 10,
-                          offset: const Offset(0, 2),
+                          offset: Offset(0, 4),
                         ),
                       ],
                     ),
-                    child: Icon(Icons.tune, color: AppColors.primary),
+                    child: const Icon(
+                      Icons.tune,
+                      color: Color(0xFF4B5563),
+                    ),
                   ),
                 ),
               ],
             ),
           ),
-          // Category Chips
+
+          // 3. Top Category Chips over Map
           Positioned(
-            top: 120,
+            top: 130,
             left: 0,
             right: 0,
-            child: Container(
-              height: 50,
+            child: SizedBox(
+              height: 40,
               child: ListView.builder(
-                scrollDirection: Axis.horizontal,
                 padding: const EdgeInsets.symmetric(horizontal: 16),
-                itemCount: 5,
+                scrollDirection: Axis.horizontal,
+                itemCount: _topCategories.length,
                 itemBuilder: (context, index) {
-                  final categories = ['All', 'Yoga', 'Gym', 'Pilates', 'Spa'];
-                  final category = categories[index];
-                  final isSelected = index == 0;
-                  return Padding(
-                    padding: const EdgeInsets.only(right: 8),
-                    child: FilterChip(
-                      label: Text(category),
-                      selected: isSelected,
-                      onSelected: (selected) {},
-                      backgroundColor: Colors.white,
-                      selectedColor: AppColors.primary,
-                      labelStyle: TextStyle(
-                        color: isSelected ? Colors.white : AppColors.textPrimary,
-                        fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+                  final cat = _topCategories[index];
+                  final isSelected = cat == _selectedTopCategory;
+                  return GestureDetector(
+                    onTap: () {
+                      setState(() => _selectedTopCategory = cat);
+                    },
+                    child: Container(
+                      margin: const EdgeInsets.only(right: 8),
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      decoration: BoxDecoration(
+                        color: isSelected ? const Color(0xFF0F5238) : Colors.white,
+                        borderRadius: BorderRadius.circular(12),
+                        boxShadow: const [
+                          BoxShadow(
+                            color: Color(0x1A000000),
+                            blurRadius: 4,
+                            offset: Offset(0, 2),
+                          ),
+                        ],
                       ),
-                      side: BorderSide(
-                        color: isSelected ? AppColors.primary : Colors.grey[300]!,
+                      alignment: Alignment.center,
+                      child: Text(
+                        cat,
+                        style: TextStyle(
+                          color: isSelected ? Colors.white : const Color(0xFF4B5563),
+                          fontSize: 14,
+                          fontFamily: 'Lexend',
+                          fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+                        ),
                       ),
                     ),
                   );
@@ -175,114 +163,144 @@ class _SearchMapScreenState extends State<SearchMapScreen> {
               ),
             ),
           ),
-          // Bottom Results Sheet
+
+          // 4. Draggable Bottom Sheet for Results
           DraggableScrollableSheet(
-            initialChildSize: 0.35,
+            initialChildSize: 0.5,
             minChildSize: 0.2,
-            maxChildSize: 0.8,
+            maxChildSize: 0.85,
             builder: (context, scrollController) {
               return Container(
                 decoration: const BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(20),
-                    topRight: Radius.circular(20),
+                    topLeft: Radius.circular(24),
+                    topRight: Radius.circular(24),
                   ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Color(0x1A000000),
+                      blurRadius: 20,
+                      offset: Offset(0, -4),
+                    ),
+                  ],
                 ),
                 child: Column(
                   children: [
+                    const SizedBox(height: 12),
                     // Handle
                     Container(
-                      margin: const EdgeInsets.symmetric(vertical: 12),
-                      width: 40,
-                      height: 4,
+                      width: 48,
+                      height: 5,
                       decoration: BoxDecoration(
-                        color: Colors.grey[300],
-                        borderRadius: BorderRadius.circular(2),
+                        color: const Color(0xFFE5E7EB),
+                        borderRadius: BorderRadius.circular(10),
                       ),
                     ),
-                    // Results Count
+                    const SizedBox(height: 20),
+                    // Title
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 20),
                       child: Row(
-                        children: [
-                          const Text(
+                        children: const [
+                          Text(
                             '6 results near you',
                             style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
+                              color: Color(0xFF6B7280),
+                              fontSize: 14,
+                              fontFamily: 'Lexend',
+                              fontWeight: FontWeight.w400,
                             ),
                           ),
                         ],
                       ),
                     ),
-                    const SizedBox(height: 8),
-                    // Day Filter
-                    Container(
-                      height: 50,
+                    const SizedBox(height: 16),
+                    // Days Filter
+                    SizedBox(
+                      height: 40,
                       child: ListView.builder(
+                        padding: const EdgeInsets.symmetric(horizontal: 20),
                         scrollDirection: Axis.horizontal,
-                        padding: const EdgeInsets.symmetric(horizontal: 16),
                         itemCount: _days.length,
                         itemBuilder: (context, index) {
                           final day = _days[index];
-                          final isSelected = _selectedDay == day;
-                          return Padding(
-                            padding: const EdgeInsets.only(right: 8),
-                            child: FilterChip(
-                              label: Text(day),
-                              selected: isSelected,
-                              onSelected: (selected) {
-                                setState(() {
-                                  _selectedDay = day;
-                                });
-                              },
-                              backgroundColor: Colors.white,
-                              selectedColor: AppColors.primary,
-                              labelStyle: TextStyle(
-                                color: isSelected ? Colors.white : AppColors.textPrimary,
-                                fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+                          final isSelected = day == _selectedDay;
+                          return GestureDetector(
+                            onTap: () {
+                              setState(() => _selectedDay = day);
+                            },
+                            child: Container(
+                              margin: const EdgeInsets.only(right: 8),
+                              padding: const EdgeInsets.symmetric(horizontal: 20),
+                              decoration: BoxDecoration(
+                                color: isSelected
+                                    ? const Color(0xFF326E51)
+                                    : Colors.white,
+                                border: Border.all(
+                                  color: isSelected
+                                      ? const Color(0xFF326E51)
+                                      : const Color(0xFFD1D5DB),
+                                  width: 1,
+                                ),
+                                borderRadius: BorderRadius.circular(20),
                               ),
-                              side: BorderSide(
-                                color: isSelected ? AppColors.primary : Colors.grey[300]!,
+                              alignment: Alignment.center,
+                              child: Text(
+                                day,
+                                style: TextStyle(
+                                  color: isSelected
+                                      ? Colors.white
+                                      : const Color(0xFF1F2937),
+                                  fontSize: 14,
+                                  fontFamily: 'Lexend',
+                                  fontWeight: isSelected
+                                      ? FontWeight.w600
+                                      : FontWeight.w400,
+                                ),
                               ),
                             ),
                           );
                         },
                       ),
                     ),
-                    // Studios List
+                    const SizedBox(height: 16),
+                    // List of Cards
                     Expanded(
                       child: ListView(
                         controller: scrollController,
-                        padding: const EdgeInsets.all(20),
+                        padding: const EdgeInsets.symmetric(horizontal: 20),
                         children: [
-                          _StudioCard(
+                          _buildStudioCard(
                             name: 'Zen Flow Studio',
-                            category: 'Yoga • Pilates',
-                            rating: 4.8,
-                            reviews: 312,
+                            categories: 'Yoga • Pilates',
+                            rating: '4.8',
+                            reviews: '(312)',
                             distance: '0.8 mi',
-                            credits: '4+',
+                            creditsText: '4+ Credits',
+                            imagePath: 'assets/Reformer Pilates.png',
                           ),
-                          const SizedBox(height: 12),
-                          _StudioCard(
+                          const SizedBox(height: 16),
+                          _buildStudioCard(
                             name: 'FitForce Gym',
-                            category: 'Gym • HIIT',
-                            rating: 4.9,
-                            reviews: 450,
+                            categories: 'Gym • HIIT',
+                            rating: '4.9',
+                            reviews: '(450)',
                             distance: '1.2 mi',
-                            credits: '6+',
+                            creditsText: '6+ Credits',
+                            imagePath: 'assets/Full Body HIIT Burn.png',
                           ),
-                          const SizedBox(height: 12),
-                          _StudioCard(
+                          const SizedBox(height: 16),
+                          _buildStudioCard(
                             name: 'Harmony Spa & GYM',
-                            category: 'Spa • Recovery',
-                            rating: 4.9,
-                            reviews: 189,
+                            categories: 'Spa • Recovery',
+                            rating: '4.9',
+                            reviews: '(189)',
                             distance: '2.5 mi',
-                            credits: '5+',
+                            creditsText: '5+ Credits',
+                            imagePath: 'assets/Morning.png',
                           ),
+                          const SizedBox(height: 24),
                         ],
                       ),
                     ),
@@ -295,135 +313,147 @@ class _SearchMapScreenState extends State<SearchMapScreen> {
       ),
     );
   }
-}
 
-class _MapMarker extends StatelessWidget {
-  final int number;
+  // Map marker UI helper removed since we're using Google Map Markers natively
 
-  const _MapMarker({required this.number});
-
-  @override
-  Widget build(BuildContext context) {
+  Widget _buildStudioCard({
+    required String name,
+    required String categories,
+    required String rating,
+    required String reviews,
+    required String distance,
+    required String creditsText,
+    required String imagePath,
+  }) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: AppColors.primary,
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.2),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Text(
-        number.toString(),
-        style: const TextStyle(
-          color: Colors.white,
-          fontWeight: FontWeight.bold,
-        ),
-      ),
-    );
-  }
-}
-
-class _StudioCard extends StatelessWidget {
-  final String name;
-  final String category;
-  final double rating;
-  final int reviews;
-  final String distance;
-  final String credits;
-
-  const _StudioCard({
-    required this.name,
-    required this.category,
-    required this.rating,
-    required this.reviews,
-    required this.distance,
-    required this.credits,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.grey[200]!),
+        color: const Color(0xFFFAFAFA),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: const Color(0xFFF3F4F6), width: 1),
       ),
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Container(
-            width: 100,
-            height: 100,
-            decoration: BoxDecoration(
-              color: Colors.grey[300],
-              borderRadius: const BorderRadius.only(
-                topLeft: Radius.circular(12),
-                bottomLeft: Radius.circular(12),
-              ),
+          // Image
+          ClipRRect(
+            borderRadius: BorderRadius.circular(12),
+            child: Image.asset(
+              imagePath,
+              width: 80,
+              height: 80,
+              fit: BoxFit.cover,
             ),
-            child: const Icon(Icons.fitness_center, size: 40),
           ),
+          const SizedBox(width: 16),
+          // Info
           Expanded(
-            child: Padding(
-              padding: const EdgeInsets.all(12),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    name,
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    category,
-                    style: TextStyle(
-                      color: AppColors.textSecondary,
-                      fontSize: 13,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Row(
-                    children: [
-                      const Icon(Icons.star, size: 16, color: Colors.amber),
-                      const SizedBox(width: 4),
-                      Text(
-                        '$rating ($reviews)',
-                        style: const TextStyle(fontSize: 12),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Expanded(
+                      child: Text(
+                        name,
+                        style: const TextStyle(
+                          color: Color(0xFF111827),
+                          fontSize: 16,
+                          fontFamily: 'Lexend',
+                          fontWeight: FontWeight.w600,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                       ),
-                      const SizedBox(width: 12),
-                      Text(
-                        '• $distance',
-                        style: TextStyle(
-                          color: AppColors.textSecondary,
-                          fontSize: 12,
+                    ),
+                    const Icon(
+                      Icons.favorite_border,
+                      color: Color(0xFF6B7280),
+                      size: 20,
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  categories,
+                  style: const TextStyle(
+                    color: Color(0xFF4B5563),
+                    fontSize: 13,
+                    fontFamily: 'Lexend',
+                    fontWeight: FontWeight.w400,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Row(
+                  children: [
+                    const Icon(Icons.star, color: Color(0xFF0F5238), size: 14),
+                    const SizedBox(width: 4),
+                    Text.rich(
+                      TextSpan(
+                        children: [
+                          TextSpan(
+                            text: rating,
+                            style: const TextStyle(
+                              color: Color(0xFF0F5238),
+                              fontSize: 12,
+                              fontFamily: 'Lexend',
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          TextSpan(
+                            text: ' $reviews',
+                            style: const TextStyle(
+                              color: Color(0xFF0F5238),
+                              fontSize: 12,
+                              fontFamily: 'Lexend',
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(width: 4),
+                    const Text(
+                      '•',
+                      style: TextStyle(
+                        color: Color(0xFF9CA3AF),
+                        fontSize: 12,
+                      ),
+                    ),
+                    const SizedBox(width: 4),
+                    Text(
+                      distance,
+                      style: const TextStyle(
+                        color: Color(0xFF6B7280),
+                        fontSize: 12,
+                        fontFamily: 'Lexend',
+                        fontWeight: FontWeight.w400,
+                      ),
+                    ),
+                    const Spacer(),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 4,
+                      ),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFDCEBDE),
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                      child: Text(
+                        creditsText,
+                        style: const TextStyle(
+                          color: Color(0xFF404943),
+                          fontSize: 11,
+                          fontFamily: 'Lexend',
+                          fontWeight: FontWeight.w600,
                         ),
                       ),
-                      const SizedBox(width: 12),
-                      Text(
-                        '• $credits Credits',
-                        style: TextStyle(
-                          color: AppColors.textSecondary,
-                          fontSize: 12,
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.only(right: 12),
-            child: IconButton(
-              onPressed: () {},
-              icon: const Icon(Icons.favorite_border),
+                    ),
+                  ],
+                ),
+              ],
             ),
           ),
         ],
@@ -432,6 +462,7 @@ class _StudioCard extends StatelessWidget {
   }
 }
 
+// Bottom Sheet for Filters
 class _FiltersBottomSheet extends StatefulWidget {
   const _FiltersBottomSheet();
 
@@ -443,71 +474,95 @@ class _FiltersBottomSheetState extends State<_FiltersBottomSheet> {
   final Set<String> _selectedCategories = {'Yoga', 'Pilates'};
   RangeValues _creditsRange = const RangeValues(1, 10);
   double _distance = 5;
-  TimeOfDay _time = const TimeOfDay(hour: 9, minute: 30);
+  double _timeHour = 9.5;
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: MediaQuery.of(context).size.height * 0.9,
+      height: MediaQuery.of(context).size.height * 0.85,
+      padding: EdgeInsets.only(bottom: MediaQuery.of(context).padding.bottom),
       decoration: const BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.only(
-          topLeft: Radius.circular(20),
-          topRight: Radius.circular(20),
+          topLeft: Radius.circular(24),
+          topRight: Radius.circular(24),
         ),
       ),
       child: Column(
         children: [
+          const SizedBox(height: 12),
+          // Handle
+          Container(
+            width: 48,
+            height: 5,
+            decoration: BoxDecoration(
+              color: const Color(0xFFE5E7EB),
+              borderRadius: BorderRadius.circular(10),
+            ),
+          ),
+          const SizedBox(height: 16),
           // Header
           Padding(
-            padding: const EdgeInsets.all(20),
+            padding: const EdgeInsets.symmetric(horizontal: 20),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                IconButton(
-                  onPressed: () => Navigator.pop(context),
-                  icon: const Icon(Icons.close),
+                GestureDetector(
+                  onTap: () => Navigator.pop(context),
+                  child: const Icon(Icons.close, color: Color(0xFF111827)),
                 ),
                 const Text(
                   'Filters',
                   style: TextStyle(
+                    color: Color(0xFF111827),
                     fontSize: 18,
-                    fontWeight: FontWeight.bold,
+                    fontFamily: 'Lexend',
+                    fontWeight: FontWeight.w700,
                   ),
                 ),
-                TextButton(
-                  onPressed: () {
+                GestureDetector(
+                  onTap: () {
                     setState(() {
                       _selectedCategories.clear();
                       _creditsRange = const RangeValues(1, 10);
-                      _distance = 5;
-                      _time = const TimeOfDay(hour: 9, minute: 30);
+                      _distance = 10;
+                      _timeHour = 9.5;
                     });
                   },
-                  child: Text(
+                  child: const Text(
                     'Reset',
-                    style: TextStyle(color: AppColors.primary),
+                    style: TextStyle(
+                      color: Color(0xFF0F5238),
+                      fontSize: 14,
+                      fontFamily: 'Lexend',
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                 ),
               ],
             ),
           ),
+          const SizedBox(height: 16),
+          const Divider(height: 1, color: Color(0xFFF3F4F6)),
+          
           Expanded(
             child: ListView(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
               children: [
-                // Category
+                // Category section
                 const Text(
                   'Category',
                   style: TextStyle(
+                    color: Color(0xFF111827),
                     fontSize: 16,
-                    fontWeight: FontWeight.bold,
+                    fontFamily: 'Lexend',
+                    fontWeight: FontWeight.w700,
                   ),
                 ),
-                const SizedBox(height: 12),
+                const SizedBox(height: 16),
                 Wrap(
-                  spacing: 8,
-                  runSpacing: 8,
+                  spacing: 12,
+                  runSpacing: 12,
                   children: [
                     'Yoga',
                     'Pilates',
@@ -518,173 +573,147 @@ class _FiltersBottomSheetState extends State<_FiltersBottomSheet> {
                     'Barre',
                     'Sauna',
                     'Dance'
-                  ].map((category) {
-                    final isSelected = _selectedCategories.contains(category);
+                  ].map((cat) {
+                    final isSelected = _selectedCategories.contains(cat);
                     return GestureDetector(
                       onTap: () {
                         setState(() {
                           if (isSelected) {
-                            _selectedCategories.remove(category);
+                            _selectedCategories.remove(cat);
                           } else {
-                            _selectedCategories.add(category);
+                            _selectedCategories.add(cat);
                           }
                         });
                       },
                       child: Container(
                         padding: const EdgeInsets.symmetric(
-                          horizontal: 16,
+                          horizontal: 20,
                           vertical: 10,
                         ),
                         decoration: BoxDecoration(
                           color: isSelected
-                              ? AppColors.primary.withValues(alpha: 0.1)
+                              ? const Color(0xFFDCEBDE)
                               : Colors.white,
                           border: Border.all(
                             color: isSelected
-                                ? AppColors.primary
-                                : Colors.grey[300]!,
+                                ? const Color(0xFFDCEBDE)
+                                : const Color(0xFFD1D5DB),
+                            width: 1,
                           ),
-                          borderRadius: BorderRadius.circular(20),
+                          borderRadius: BorderRadius.circular(8),
                         ),
                         child: Text(
-                          category,
+                          cat,
                           style: TextStyle(
-                            color: isSelected
-                                ? AppColors.primary
-                                : AppColors.textPrimary,
+                            color: const Color(0xFF4B5563),
+                            fontSize: 14,
+                            fontFamily: 'Lexend',
                             fontWeight: isSelected
-                                ? FontWeight.w600
-                                : FontWeight.normal,
+                                ? FontWeight.w500
+                                : FontWeight.w400,
                           ),
                         ),
                       ),
                     );
                   }).toList(),
                 ),
-                const SizedBox(height: 24),
-                // Credits
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    const Text(
-                      'Credits',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    Text(
-                      '${_creditsRange.start.round()} cr — ${_creditsRange.end.round()} cr',
-                      style: TextStyle(color: AppColors.textSecondary),
-                    ),
-                  ],
+                const SizedBox(height: 32),
+
+                // Credits section
+                _buildSliderHeader(
+                  'Credits',
+                  '${_creditsRange.start.round()} cr — ${_creditsRange.end.round()} cr',
                 ),
                 RangeSlider(
                   values: _creditsRange,
                   min: 1,
                   max: 10,
                   divisions: 9,
-                  activeColor: AppColors.primary,
-                  onChanged: (values) {
-                    setState(() {
-                      _creditsRange = values;
-                    });
-                  },
+                  activeColor: const Color(0xFF0F5238),
+                  inactiveColor: const Color(0xFFE5E7EB),
+                  onChanged: (vals) => setState(() => _creditsRange = vals),
                 ),
-                const SizedBox(height: 16),
-                // Distance
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    const Text(
-                      'Distance',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    Text(
-                      '0 km — ${_distance.round()} km',
-                      style: TextStyle(color: AppColors.textSecondary),
-                    ),
-                  ],
+                const SizedBox(height: 24),
+
+                // Distance section
+                _buildSliderHeader(
+                  'Distance',
+                  '0 km — ${_distance.round()} km',
                 ),
                 Slider(
                   value: _distance,
                   min: 0,
-                  max: 10,
-                  divisions: 10,
-                  activeColor: AppColors.primary,
-                  onChanged: (value) {
-                    setState(() {
-                      _distance = value;
-                    });
-                  },
+                  max: 20,
+                  divisions: 20,
+                  activeColor: const Color(0xFF0F5238),
+                  inactiveColor: const Color(0xFFE5E7EB),
+                  onChanged: (val) => setState(() => _distance = val),
                 ),
-                const SizedBox(height: 16),
-                // Time
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    const Text(
-                      'Time (Hours)',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    Text(
-                      '${_time.hour}:${_time.minute.toString().padLeft(2, '0')} AM',
-                      style: TextStyle(color: AppColors.textSecondary),
-                    ),
-                  ],
+                const SizedBox(height: 24),
+
+                // Time section
+                _buildSliderHeader(
+                  'Time (Hours)',
+                  _formatTime(_timeHour),
                 ),
                 Slider(
-                  value: _time.hour.toDouble(),
-                  min: 0,
+                  value: _timeHour,
+                  min: 5,
                   max: 23,
-                  divisions: 23,
-                  activeColor: AppColors.primary,
-                  onChanged: (value) {
-                    setState(() {
-                      _time = TimeOfDay(hour: value.round(), minute: _time.minute);
-                    });
-                  },
+                  divisions: 36, // Every 30 mins
+                  activeColor: const Color(0xFF0F5238),
+                  inactiveColor: const Color(0xFFE5E7EB),
+                  onChanged: (val) => setState(() => _timeHour = val),
                 ),
-                const SizedBox(height: 16),
-                // Rating Minimum
+                const SizedBox(height: 24),
+
+                // Rating Minimum section
                 const Text(
                   'Rating Minimum',
                   style: TextStyle(
+                    color: Color(0xFF111827),
                     fontSize: 16,
-                    fontWeight: FontWeight.bold,
+                    fontFamily: 'Lexend',
+                    fontWeight: FontWeight.w700,
                   ),
                 ),
-                const SizedBox(height: 40),
+                const SizedBox(height: 24),
               ],
             ),
           ),
+          
           // Show Results Button
-          Padding(
-            padding: const EdgeInsets.all(20),
+          Container(
+            padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
+            decoration: const BoxDecoration(
+              color: Colors.white,
+              boxShadow: [
+                BoxShadow(
+                  color: Color(0x0A000000),
+                  blurRadius: 10,
+                  offset: Offset(0, -4),
+                ),
+              ],
+            ),
             child: SizedBox(
               width: double.infinity,
               child: ElevatedButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                },
+                onPressed: () => Navigator.pop(context),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.primary,
+                  backgroundColor: const Color(0xFF006B3D),
                   padding: const EdgeInsets.symmetric(vertical: 16),
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: BorderRadius.circular(100),
                   ),
+                  elevation: 0,
                 ),
                 child: const Text(
                   'Show Results',
                   style: TextStyle(
+                    color: Colors.white,
                     fontSize: 16,
-                    fontWeight: FontWeight.w600,
+                    fontFamily: 'Lexend',
+                    fontWeight: FontWeight.w500,
                   ),
                 ),
               ),
@@ -693,5 +722,42 @@ class _FiltersBottomSheetState extends State<_FiltersBottomSheet> {
         ],
       ),
     );
+  }
+
+  Widget _buildSliderHeader(String title, String value) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 8),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            title,
+            style: const TextStyle(
+              color: Color(0xFF111827),
+              fontSize: 16,
+              fontFamily: 'Lexend',
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+          Text(
+            value,
+            style: const TextStyle(
+              color: Color(0xFF0F5238),
+              fontSize: 14,
+              fontFamily: 'Lexend',
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  String _formatTime(double hourVal) {
+    int h = hourVal.floor();
+    int m = ((hourVal - h) * 60).round();
+    String period = h >= 12 ? 'PM' : 'AM';
+    int displayHour = h > 12 ? h - 12 : (h == 0 ? 12 : h);
+    return '$displayHour:${m.toString().padLeft(2, '0')} $period';
   }
 }

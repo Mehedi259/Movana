@@ -15,6 +15,7 @@ class _SearchScreenState extends State<SearchScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      extendBody: true,
       backgroundColor: Colors.white,
       body: SafeArea(
         child: Column(
@@ -234,6 +235,28 @@ class _SearchScreenState extends State<SearchScreen> {
           ],
         ),
       ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+      floatingActionButton: ElevatedButton.icon(
+        onPressed: () => Navigator.pushNamed(context, AppRoutes.searchMap),
+        icon: const Icon(Icons.map_outlined, color: Colors.white, size: 18),
+        label: const Text(
+          'Map View',
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 14,
+            fontFamily: 'Lexend',
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+        style: ElevatedButton.styleFrom(
+          backgroundColor: const Color(0xFF006B3D),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(100),
+          ),
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+          elevation: 4,
+        ),
+      ),
       bottomNavigationBar: const CustomBottomNavBar(currentIndex: 1),
     );
   }
@@ -380,51 +403,60 @@ class _SearchResultCard extends StatelessWidget {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Row(
-                        children: [
-                          const Icon(
-                            Icons.star,
-                            size: 14,
-                            color: Color(0xFF0F5238),
-                          ),
-                          const SizedBox(width: 4),
-                          Text(
-                            '$rating ($reviews)',
-                            style: const TextStyle(
+                      Expanded(
+                        child: Row(
+                          children: [
+                            const Icon(
+                              Icons.star,
+                              size: 14,
                               color: Color(0xFF0F5238),
-                              fontSize: 12,
-                              fontFamily: 'Lexend',
-                              fontWeight: FontWeight.w600,
-                              height: 1.50,
-                              letterSpacing: 0.60,
                             ),
-                          ),
-                          const SizedBox(width: 4),
-                          const Text(
-                            '•',
-                            style: TextStyle(
-                              color: Color(0xFFBFC9C1),
-                              fontSize: 16,
-                              fontFamily: 'Lexend',
-                              fontWeight: FontWeight.w400,
-                              height: 1.50,
+                            const SizedBox(width: 4),
+                            Flexible(
+                              child: Text(
+                                '$rating ($reviews)',
+                                style: const TextStyle(
+                                  color: Color(0xFF0F5238),
+                                  fontSize: 12,
+                                  fontFamily: 'Lexend',
+                                  fontWeight: FontWeight.w600,
+                                  height: 1.50,
+                                  letterSpacing: 0.60,
+                                ),
+                                overflow: TextOverflow.ellipsis,
+                              ),
                             ),
-                          ),
-                          const SizedBox(width: 4),
-                          Text(
-                            distance,
-                            style: const TextStyle(
-                              color: Color(0xFF707973),
-                              fontSize: 12,
-                              fontFamily: 'Lexend',
-                              fontWeight: FontWeight.w400,
-                              height: 1.33,
+                            const SizedBox(width: 4),
+                            const Text(
+                              '•',
+                              style: TextStyle(
+                                color: Color(0xFFBFC9C1),
+                                fontSize: 16,
+                                fontFamily: 'Lexend',
+                                fontWeight: FontWeight.w400,
+                                height: 1.50,
+                              ),
                             ),
-                          ),
-                        ],
+                            const SizedBox(width: 4),
+                            Flexible(
+                              child: Text(
+                                distance,
+                                style: const TextStyle(
+                                  color: Color(0xFF707973),
+                                  fontSize: 12,
+                                  fontFamily: 'Lexend',
+                                  fontWeight: FontWeight.w400,
+                                  height: 1.33,
+                                ),
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
+                      const SizedBox(width: 4),
                       Container(
-                        padding: const EdgeInsets.all(8),
+                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
                         decoration: BoxDecoration(
                           color: const Color(0xFFD9E6DA),
                           borderRadius: BorderRadius.circular(4),
