@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_routes.dart';
 import '../../../../shared/widgets/custom_button.dart';
+import '../../services/auth_service.dart';
 
 class VerificationScreen extends StatefulWidget {
   const VerificationScreen({super.key});
@@ -28,17 +29,35 @@ class _VerificationScreenState extends State<VerificationScreen> {
     super.dispose();
   }
 
-  Future<void> _handleVerify() async {
+  Future<void> _handleVerify(String email) async {
+    final otp = _controllers.map((c) => c.text).join();
+    if (otp.length < 6) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please enter 6 digit code')),
+      );
+      return;
+    }
+
     setState(() => _isLoading = true);
-    await Future.delayed(const Duration(seconds: 2));
-    if (mounted) {
-      setState(() => _isLoading = false);
-      Navigator.pushNamed(context, AppRoutes.resetPassword);
+    try {
+      await AuthService.verifyOtp(email: email, otp: otp);
+      if (mounted) {
+        setState(() => _isLoading = false);
+        Navigator.pushNamedAndRemoveUntil(context, AppRoutes.login, (route) => false);
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() => _isLoading = false);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(e.toString().replaceAll('Exception: ', ''))),
+        );
+      }
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final email = ModalRoute.of(context)?.settings.arguments as String? ?? '';
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -108,7 +127,7 @@ class _VerificationScreenState extends State<VerificationScreen> {
               // Verify Button
               CustomButton(
                 text: 'Verify',
-                onPressed: _handleVerify,
+                onPressed: () => _handleVerify(email),
                 isLoading: _isLoading,
               ),
             ],

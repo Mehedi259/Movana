@@ -269,7 +269,9 @@ class _FavoriteStudioCardState extends State<_FavoriteStudioCard> {
                 color: const Color(0xFFE1E3DF),
                 borderRadius: BorderRadius.circular(12),
                 image: DecorationImage(
-                  image: AssetImage(widget.imagePath),
+                  image: widget.imagePath.startsWith('http')
+                      ? NetworkImage(widget.imagePath) as ImageProvider
+                      : AssetImage(widget.imagePath),
                   fit: BoxFit.cover,
                 ),
               ),

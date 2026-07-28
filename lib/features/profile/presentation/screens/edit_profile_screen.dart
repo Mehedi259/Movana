@@ -1,4 +1,7 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
+import '../../services/profile_service.dart';
 
 class EditProfileScreen extends StatefulWidget {
   const EditProfileScreen({super.key});
@@ -8,21 +11,76 @@ class EditProfileScreen extends StatefulWidget {
 }
 
 class _EditProfileScreenState extends State<EditProfileScreen> {
-  final _firstNameController = TextEditingController(text: 'Alex');
-  final _lastNameController = TextEditingController(text: 'Johnson');
-  final _emailController = TextEditingController(text: 'alex.johnson@email.com');
+  final _firstNameController = TextEditingController();
+  final _lastNameController = TextEditingController();
   final _phoneController = TextEditingController(text: '555-0198');
   final _dobController = TextEditingController(text: '10/12/1992');
   final _locationController = TextEditingController(text: 'San Francisco, CA');
   
   String _selectedGender = 'Male';
-  bool _isLoading = false;
+  String _selectedCountryCode = '+1';
+  bool _isLoading = true;
+  bool _isSaving = false;
+  File? _imageFile;
+  String? _imageUrl;
+  final ImagePicker _picker = ImagePicker();
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchProfile();
+  }
+
+  Future<void> _fetchProfile() async {
+    try {
+      final data = await ProfileService.getProfile();
+      if (mounted) {
+        setState(() {
+          final name = data['name']?.toString() ?? '';
+          final parts = name.split(' ');
+          _firstNameController.text = parts.isNotEmpty ? parts[0] : '';
+          _lastNameController.text = parts.length > 1 ? parts.sublist(1).join(' ') : '';
+          if (data['phone'] != null) _phoneController.text = data['phone'].toString();
+          _imageUrl = data['image']?.toString();
+          
+          // Handle Date of Birth (backend might send YYYY-MM-DD, we show MM/DD/YYYY)
+          if (data['date_of_birth'] != null) {
+            final parts = data['date_of_birth'].toString().split('-');
+            if (parts.length == 3) {
+               _dobController.text = '${parts[1]}/${parts[2]}/${parts[0]}';
+            } else {
+               _dobController.text = data['date_of_birth'].toString();
+            }
+          }
+          if (data['gender'] != null) _selectedGender = data['gender'].toString();
+          if (data['location'] != null) _locationController.text = data['location'].toString();
+          
+          _isLoading = false;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() => _isLoading = false);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(e.toString().replaceAll('Exception: ', ''))),
+        );
+      }
+    }
+  }
+
+  Future<void> _pickImage() async {
+    final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
+    if (image != null) {
+      setState(() {
+        _imageFile = File(image.path);
+      });
+    }
+  }
 
   @override
   void dispose() {
     _firstNameController.dispose();
     _lastNameController.dispose();
-    _emailController.dispose();
     _phoneController.dispose();
     _dobController.dispose();
     _locationController.dispose();
@@ -30,16 +88,50 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   }
 
   Future<void> _handleSave() async {
-    setState(() => _isLoading = true);
-    await Future.delayed(const Duration(seconds: 2));
-    if (mounted) {
-      setState(() => _isLoading = false);
-      Navigator.pop(context);
+    setState(() => _isSaving = true);
+    try {
+      final name = '${_firstNameController.text.trim()} ${_lastNameController.text.trim()}'.trim();
+      
+      // Convert MM/DD/YYYY to YYYY-MM-DD for backend
+      String? dobStr;
+      if (_dobController.text.isNotEmpty) {
+        final parts = _dobController.text.split('/');
+        if (parts.length == 3) {
+          dobStr = '${parts[2]}-${parts[0].padLeft(2, '0')}-${parts[1].padLeft(2, '0')}';
+        } else {
+          dobStr = _dobController.text;
+        }
+      }
+
+      await ProfileService.updateProfile({
+        'name': name,
+        'phone': _phoneController.text.trim(),
+        if (dobStr != null) 'date_of_birth': dobStr,
+        'gender': _selectedGender,
+        'location': _locationController.text.trim(),
+      }, imageFile: _imageFile);
+      if (mounted) {
+        setState(() => _isSaving = false);
+        Navigator.pop(context);
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Profile updated successfully')),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() => _isSaving = false);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(e.toString().replaceAll('Exception: ', ''))),
+        );
+      }
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    if (_isLoading) {
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+    }
     return Scaffold(
       backgroundColor: const Color(0xFFF8FAFC),
       appBar: AppBar(
@@ -80,30 +172,44 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       ),
                     ),
                     child: ClipOval(
-                      child: Image.asset(
-                        'assets/Alex Johnson.png',
-                        fit: BoxFit.cover,
-                      ),
+                      child: _imageFile != null
+                          ? Image.file(
+                              _imageFile!,
+                              fit: BoxFit.cover,
+                            )
+                          : _imageUrl != null
+                              ? Image.network(
+                                  _imageUrl!.startsWith('http') ? _imageUrl! : 'http://16.170.40.206:8000$_imageUrl',
+                                  fit: BoxFit.cover,
+                                  errorBuilder: (_, __, ___) => Image.asset('assets/Alex Johnson.png', fit: BoxFit.cover),
+                                )
+                              : Image.asset(
+                                  'assets/Alex Johnson.png',
+                                  fit: BoxFit.cover,
+                                ),
                     ),
                   ),
                   Positioned(
                     bottom: 0,
                     right: 0,
-                    child: Container(
-                      width: 36,
-                      height: 36,
-                      decoration: BoxDecoration(
-                        color: const Color(0xFF10B981),
-                        shape: BoxShape.circle,
-                        border: Border.all(
-                          color: Colors.white,
-                          width: 3,
+                    child: GestureDetector(
+                      onTap: _pickImage,
+                      child: Container(
+                        width: 36,
+                        height: 36,
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF10B981),
+                          shape: BoxShape.circle,
+                          border: Border.all(
+                            color: Colors.white,
+                            width: 3,
+                          ),
                         ),
-                      ),
-                      child: const Icon(
-                        Icons.camera_alt,
-                        size: 18,
-                        color: Colors.white,
+                        child: const Icon(
+                          Icons.camera_alt,
+                          size: 18,
+                          color: Colors.white,
+                        ),
                       ),
                     ),
                   ),
@@ -112,15 +218,21 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             ),
             const SizedBox(height: 16),
             // Name
-            const Center(
-              child: Text(
-                'Alex Johnson',
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  color: Color(0xFF0F172A),
-                  fontFamily: 'Lexend',
-                ),
+            Center(
+              child: AnimatedBuilder(
+                animation: Listenable.merge([_firstNameController, _lastNameController]),
+                builder: (context, _) {
+                  final fullName = '${_firstNameController.text} ${_lastNameController.text}'.trim();
+                  return Text(
+                    fullName.isEmpty ? 'User Name' : fullName,
+                    style: const TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      color: Color(0xFF0F172A),
+                      fontFamily: 'Lexend',
+                    ),
+                  );
+                },
               ),
             ),
             const SizedBox(height: 32),
@@ -256,57 +368,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     ],
                   ),
                   const SizedBox(height: 24),
-                  // Email
-                  const Text(
-                    'EMAIL',
-                    style: TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w600,
-                      letterSpacing: 1.2,
-                      color: Color(0xFF64748B),
-                      fontFamily: 'Inter',
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  TextField(
-                    controller: _emailController,
-                    keyboardType: TextInputType.emailAddress,
-                    decoration: InputDecoration(
-                      hintText: 'alex.johnson@email.com',
-                      hintStyle: const TextStyle(
-                        color: Color(0xFF94A3B8),
-                        fontFamily: 'Inter',
-                      ),
-                      filled: true,
-                      fillColor: const Color(0xFFF8FAFC),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: const BorderSide(
-                          color: Color(0xFFE2E8F0),
-                          width: 1,
-                        ),
-                      ),
-                      enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: const BorderSide(
-                          color: Color(0xFFE2E8F0),
-                          width: 1,
-                        ),
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: const BorderSide(
-                          color: Color(0xFF10B981),
-                          width: 2,
-                        ),
-                      ),
-                      contentPadding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 14,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 24),
                   // Phone Number
                   const Text(
                     'PHONE NUMBER',
@@ -324,7 +385,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       Container(
                         padding: const EdgeInsets.symmetric(
                           horizontal: 12,
-                          vertical: 14,
+                          vertical: 0, // Adjusted vertical padding for dropdown
                         ),
                         decoration: BoxDecoration(
                           color: const Color(0xFFF8FAFC),
@@ -334,30 +395,45 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                           ),
                           borderRadius: BorderRadius.circular(12),
                         ),
-                        child: Row(
-                          children: [
-                            Container(
-                              width: 24,
-                              height: 16,
-                              decoration: BoxDecoration(
-                                color: Colors.red,
-                                borderRadius: BorderRadius.circular(2),
-                              ),
-                            ),
-                            const SizedBox(width: 8),
-                            const Text(
-                              '+1',
-                              style: TextStyle(
-                                color: Color(0xFF0F172A),
-                                fontFamily: 'Inter',
-                              ),
-                            ),
-                            const Icon(
+                        child: DropdownButtonHideUnderline(
+                          child: DropdownButton<String>(
+                            value: _selectedCountryCode,
+                            icon: const Icon(
                               Icons.arrow_drop_down,
                               size: 20,
                               color: Color(0xFF64748B),
                             ),
-                          ],
+                            items: ['+1', '+44', '+880', '+91', '+971'].map((String code) {
+                              return DropdownMenuItem<String>(
+                                value: code,
+                                child: Row(
+                                  children: [
+                                    Container(
+                                      width: 24,
+                                      height: 16,
+                                      decoration: BoxDecoration(
+                                        color: Colors.red,
+                                        borderRadius: BorderRadius.circular(2),
+                                      ),
+                                    ),
+                                    const SizedBox(width: 8),
+                                    Text(
+                                      code,
+                                      style: const TextStyle(
+                                        color: Color(0xFF0F172A),
+                                        fontFamily: 'Inter',
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              );
+                            }).toList(),
+                            onChanged: (value) {
+                              if (value != null) {
+                                setState(() => _selectedCountryCode = value);
+                              }
+                            },
+                          ),
                         ),
                       ),
                       const SizedBox(width: 12),
@@ -586,7 +662,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               child: SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
-                  onPressed: _isLoading ? null : _handleSave,
+                  onPressed: _isSaving ? null : _handleSave,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF10B981),
                     foregroundColor: Colors.white,
@@ -597,7 +673,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     ),
                     disabledBackgroundColor: const Color(0xFF94A3B8),
                   ),
-                  child: _isLoading
+                  child: _isSaving
                       ? const SizedBox(
                           height: 20,
                           width: 20,

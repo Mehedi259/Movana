@@ -1,9 +1,54 @@
 import 'package:flutter/material.dart';
 import '../../../../core/constants/app_routes.dart';
 import '../../../../shared/widgets/custom_bottom_nav_bar.dart';
+import '../../services/profile_service.dart';
 
-class ProfileScreen extends StatelessWidget {
+class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
+
+  @override
+  State<ProfileScreen> createState() => _ProfileScreenState();
+}
+
+class _ProfileScreenState extends State<ProfileScreen> {
+  Map<String, dynamic>? _profileData;
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchProfile();
+  }
+
+  Future<void> _fetchProfile() async {
+    try {
+      final data = await ProfileService.getProfile();
+      if (mounted) {
+        setState(() {
+          _profileData = data;
+          _isLoading = false;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() => _isLoading = false);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(e.toString().replaceAll('Exception: ', ''))),
+        );
+      }
+    }
+  }
+
+  Future<void> _handleLogout() async {
+    try {
+      await ProfileService.logout();
+    } catch (e) {
+      // Ignore logout API error if token is already invalid
+    }
+    if (mounted) {
+      Navigator.pushNamedAndRemoveUntil(context, AppRoutes.login, (route) => false);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -32,38 +77,48 @@ class ProfileScreen extends StatelessWidget {
                         ),
                       ),
                       child: ClipOval(
-                        child: Image.asset(
-                          'assets/Alex Johnson.png',
-                          fit: BoxFit.cover,
-                        ),
+                        child: _profileData?['image'] != null
+                            ? Image.network(
+                                _profileData!['image'].toString().startsWith('http') 
+                                    ? _profileData!['image'] 
+                                    : 'http://16.170.40.206:8000${_profileData!['image']}',
+                                fit: BoxFit.cover,
+                                errorBuilder: (_, __, ___) => Image.asset('assets/Alex Johnson.png', fit: BoxFit.cover),
+                              )
+                            : Image.asset(
+                                'assets/Alex Johnson.png',
+                                fit: BoxFit.cover,
+                              ),
                       ),
                     ),
                     const SizedBox(width: 16),
                     // Name and Email
                     Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Text(
-                            'Alex Johnson',
-                            style: TextStyle(
-                              fontSize: 24,
-                              fontWeight: FontWeight.bold,
-                              color: Color(0xFF0F172A),
-                              fontFamily: 'Lexend',
-                            ),
+                      child: _isLoading 
+                        ? const Center(child: CircularProgressIndicator())
+                        : Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                _profileData?['name'] ?? 'User',
+                                style: const TextStyle(
+                                  fontSize: 24,
+                                  fontWeight: FontWeight.bold,
+                                  color: Color(0xFF0F172A),
+                                  fontFamily: 'Lexend',
+                                ),
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                _profileData?['email'] ?? '',
+                                style: const TextStyle(
+                                  fontSize: 14,
+                                  color: Color(0xFF64748B),
+                                  fontFamily: 'Inter',
+                                ),
+                              ),
+                            ],
                           ),
-                          const SizedBox(height: 4),
-                          Text(
-                            'alex.johnson@email.com',
-                            style: TextStyle(
-                              fontSize: 14,
-                              color: const Color(0xFF64748B),
-                              fontFamily: 'Inter',
-                            ),
-                          ),
-                        ],
-                      ),
                     ),
                     // Edit Button
                     Container(
@@ -83,8 +138,9 @@ class ProfileScreen extends StatelessWidget {
                           size: 20,
                           color: Color(0xFF64748B),
                         ),
-                        onPressed: () {
-                          Navigator.pushNamed(context, AppRoutes.editProfile);
+                        onPressed: () async {
+                          await Navigator.pushNamed(context, AppRoutes.editProfile);
+                          _fetchProfile();
                         },
                         padding: EdgeInsets.zero,
                       ),
@@ -235,8 +291,9 @@ class ProfileScreen extends StatelessWidget {
                     _MenuItem(
                       icon: Icons.person_outline,
                       title: 'Personal Information',
-                      onTap: () {
-                        Navigator.pushNamed(context, AppRoutes.editProfile);
+                      onTap: () async {
+                        await Navigator.pushNamed(context, AppRoutes.editProfile);
+                        _fetchProfile();
                       },
                     ),
                     const Divider(height: 1, color: Color(0xFFE2E8F0)),
@@ -339,13 +396,7 @@ class ProfileScreen extends StatelessWidget {
                 child: SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(
-                    onPressed: () {
-                      Navigator.pushNamedAndRemoveUntil(
-                        context,
-                        AppRoutes.login,
-                        (route) => false,
-                      );
-                    },
+                    onPressed: _handleLogout,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFFFEE2E2),
                       foregroundColor: const Color(0xFFEF4444),

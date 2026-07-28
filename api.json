@@ -1,0 +1,1920 @@
+{
+	"info": {
+		"_postman_id": "86af7253-91c6-4749-82a4-0e3af5eff6ac",
+		"name": "Fitness App",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "44600470",
+		"_collection_link": "https://ferdoshossainkhurrom.postman.co/workspace/Ferdos-Hossain-Khurrom's-Worksp~d644082f-9fd5-42e6-80a7-2aa5fd562bd1/collection/44600470-86af7253-91c6-4749-82a4-0e3af5eff6ac?action=share&source=collection_link&creator=44600470"
+	},
+	"item": [
+		{
+			"name": "Auth",
+			"item": [
+				{
+					"name": "Register",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"ferdos.khurrom@gmail.com\",\n    \"name\": \"khurrom\",\n    \"password\":123456,\n    \"password2\":123456\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{fitness}}accounts/user/register/",
+							"host": [
+								"{{fitness}}accounts"
+							],
+							"path": [
+								"user",
+								"register",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Root UserLogin",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"admin@gmail.com\",\n  \"password\": \"123\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://127.0.0.1:8000/accounts/user/root-admin/login/",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8000",
+							"path": [
+								"accounts",
+								"user",
+								"root-admin",
+								"login",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Sub admin Login",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"ferdos.khurrom@gmail.com\",\n  \"password\": \"12345678\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://127.0.0.1:8000/accounts/user/sub-admin/login/",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8000",
+							"path": [
+								"accounts",
+								"user",
+								"sub-admin",
+								"login",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Authenticator User",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"dedon28065@luxudata.com\",\n  \"password\": \"dedon28065\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://127.0.0.1:8000/accounts/user/login/",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8000",
+							"path": [
+								"accounts",
+								"user",
+								"login",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Sub Admin",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzg1MjUzNTIyLCJpYXQiOjE3ODI2NjE1MjIsImp0aSI6IjljNGY2OWQ1YTQwYTQ5M2FhNDYwOGNhYTc2YjhmOWVlIiwidXNlcl9pZCI6IjEifQ.915dJG0uBRHZ4GpbH58PYIrNWjyRDYwi6Z7AieEwnlI",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"ferdos.khurrom@gmail.com\",\n  \"full_name\": \"Khurrom\",\n  \"phone\": \"string\",\n  \"password\": \"1234\",\n  \"confirm_password\": \"1234\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://127.0.0.1:8000/accounts/user/root-admin/create-sub-admin/",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8000",
+							"path": [
+								"accounts",
+								"user",
+								"root-admin",
+								"create-sub-admin",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "New Access Token",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"refresh\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoicmVmcmVzaCIsImV4cCI6MTc4NTMzNTI3MywiaWF0IjoxNzgyNjU2ODczLCJqdGkiOiI0YjMxNjAxYjUyZGU0NThhOWY4OWM2NzIxZjM3YTNiMSIsInVzZXJfaWQiOiIxIn0.2hmi16DhdQwJMUbgiHZuSgrKNRQhUyQ98Ehn1CbssSQ\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{fitness}}accounts/user/token/refresh/",
+							"host": [
+								"{{fitness}}accounts"
+							],
+							"path": [
+								"user",
+								"token",
+								"refresh",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Resend OTP",
+					"request": {
+						"method": "GET",
+						"header": []
+					},
+					"response": []
+				},
+				{
+					"name": "Verify OTP",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"user@example.com\",\n  \"otp\": \"string\"\n}"
+						},
+						"url": {
+							"raw": "{{fitness}}api/accounts/user/verify-otp/",
+							"host": [
+								"{{fitness}}api"
+							],
+							"path": [
+								"accounts",
+								"user",
+								"verify-otp",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Profile",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"ferdos.khurrom@gmail.com\",\n    \"name\": \"khurrom\",\n    \"password\":123456,\n    \"password2\":123456\n}"
+						},
+						"url": {
+							"raw": "{{fitness}}accounts/user/profile/",
+							"host": [
+								"{{fitness}}accounts"
+							],
+							"path": [
+								"user",
+								"profile",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Change Password",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzg0OTA1Njk5LCJpYXQiOjE3ODIzMTM2OTksImp0aSI6IjEyODdjNzA3MWQyNTQ2YTZhMGRmOGQwNGRlODhlYWVhIiwidXNlcl9pZCI6IjgifQ.0j8ZLkK3SUa_z9TsVRFANdwFHX40cY15QbGa0kkcSY4",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"current_password\": \"string\",\n  \"new_password\": \"string\",\n  \"confirm_new_password\": \"string\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{fitness}}accounts/user/change-password/",
+							"host": [
+								"{{fitness}}accounts"
+							],
+							"path": [
+								"user",
+								"change-password",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Forget Password",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"ferdos.khurrom@gmail.com\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{fitness}}accounts/user/send-reset-password-email/",
+							"host": [
+								"{{fitness}}accounts"
+							],
+							"path": [
+								"user",
+								"send-reset-password-email",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Reset Password",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"admin@gmail.com\",\n  \"otp\": \"237210\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{fitness}}accounts/user/reset-password-otp/",
+							"host": [
+								"{{fitness}}accounts"
+							],
+							"path": [
+								"user",
+								"reset-password-otp",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Reset New Password",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"reset_token\": \"24a71187-0b0f-4f03-ab0a-8ee27addfbdd\",\n  \"new_password\": \"123456\",\n  \"new_password2\": \"123456\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{fitness}}accounts/user/set-new-password/",
+							"host": [
+								"{{fitness}}accounts"
+							],
+							"path": [
+								"user",
+								"set-new-password",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Logout",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzg0OTA1Njk5LCJpYXQiOjE3ODIzMTM2OTksImp0aSI6IjEyODdjNzA3MWQyNTQ2YTZhMGRmOGQwNGRlODhlYWVhIiwidXNlcl9pZCI6IjgifQ.0j8ZLkK3SUa_z9TsVRFANdwFHX40cY15QbGa0kkcSY4",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"refresh\": \"string\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{fitness}}accounts/user/logout/",
+							"host": [
+								"{{fitness}}accounts"
+							],
+							"path": [
+								"user",
+								"logout",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Account",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzg0OTA1Njk5LCJpYXQiOjE3ODIzMTM2OTksImp0aSI6IjEyODdjNzA3MWQyNTQ2YTZhMGRmOGQwNGRlODhlYWVhIiwidXNlcl9pZCI6IjgifQ.0j8ZLkK3SUa_z9TsVRFANdwFHX40cY15QbGa0kkcSY4",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"refresh\": \"string\"\n}"
+						},
+						"url": {
+							"raw": "{{fitness}}accounts/user/delete-account/",
+							"host": [
+								"{{fitness}}accounts"
+							],
+							"path": [
+								"user",
+								"delete-account",
+								""
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Stdio",
+			"item": [
+				{
+					"name": "Stdio Management",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzg1MzI3MTIwLCJpYXQiOjE3ODI3MzUxMjAsImp0aSI6IjUzOTQ0NmFiNjIzMTQ1ZmM4YTZhNGE4N2Q4NmEwZjM2IiwidXNlcl9pZCI6IjkifQ.sNjIIXrM1rsbRSFCt0Wys9KFctsF743YfS4N3BlOC1I",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "name",
+									"value": "MY STDIO",
+									"type": "text"
+								},
+								{
+									"key": "email",
+									"value": "ferdos.khurrom@gmail.com",
+									"type": "text"
+								},
+								{
+									"key": "full_address",
+									"value": "mohakhali, Dhaka",
+									"type": "text"
+								},
+								{
+									"key": "primary_category",
+									"value": "wet, gym",
+									"type": "text"
+								},
+								{
+									"key": "description",
+									"value": "this is fitness app",
+									"type": "text"
+								},
+								{
+									"key": "cover_photo",
+									"type": "file",
+									"src": "postman-cloud:///1f16cc44-3eb7-4410-8dd8-0f69f080aa59"
+								},
+								{
+									"key": "images",
+									"type": "file",
+									"src": [
+										"postman-cloud:///1f12c7db-acfa-42e0-bdb6-853d20cd100b",
+										"postman-cloud:///1f11e585-abb3-4690-8eac-6f65158e2c71",
+										"postman-cloud:///1f14d414-7a08-4070-b04c-4379c797cdeb"
+									]
+								},
+								{
+									"key": "images",
+									"value": "",
+									"type": "text",
+									"disabled": true
+								},
+								{
+									"key": "videos",
+									"type": "file",
+									"src": "postman-cloud:///1f16fddc-5883-4690-b56f-9235c438a2d3"
+								},
+								{
+									"key": "videos",
+									"value": "",
+									"type": "text",
+									"disabled": true
+								}
+							]
+						},
+						"url": {
+							"raw": "{{fitness}}studios/my-studio/",
+							"host": [
+								"{{fitness}}studios"
+							],
+							"path": [
+								"my-studio",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Class Management",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzg1NTg1MjU0LCJpYXQiOjE3ODI5OTMyNTQsImp0aSI6IjFhN2E2YzU2MTk3NTQ2MWVhYmUyNjZiZWQ1ZWEwOTgxIiwidXNlcl9pZCI6IjkifQ.UbqF8xm5-XNaXiLa-2ZhfLgznZyOTNCwGPy_e1G7_lE",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "name",
+									"value": "Vinyasa Flow",
+									"type": "text"
+								},
+								{
+									"key": "location",
+									"value": "Room A",
+									"type": "text"
+								},
+								{
+									"key": "category",
+									"value": "Yoga",
+									"type": "text"
+								},
+								{
+									"key": "description",
+									"value": "All levels welcome",
+									"type": "text"
+								},
+								{
+									"key": "recurrence",
+									"value": "weekly",
+									"type": "text"
+								},
+								{
+									"key": "start_time",
+									"value": "18:00:00",
+									"type": "text"
+								},
+								{
+									"key": "duration_minutes",
+									"value": "60",
+									"type": "text"
+								},
+								{
+									"key": "capacity",
+									"value": "25",
+									"type": "text"
+								},
+								{
+									"key": "price",
+									"value": "15.00",
+									"type": "text"
+								},
+								{
+									"key": "images",
+									"type": "file",
+									"src": [
+										"postman-cloud:///1f12c7db-acfa-42e0-bdb6-853d20cd100b",
+										"postman-cloud:///1f172245-7a16-44a0-915e-a3732c90b38f"
+									]
+								},
+								{
+									"key": "what_to_bring",
+									"value": "Yoga mat, towel",
+									"type": "text"
+								},
+								{
+									"key": "is_what_to_bring_required",
+									"value": "true",
+									"type": "text"
+								},
+								{
+									"key": "amenities",
+									"value": "Showers, Lockers",
+									"type": "text"
+								},
+								{
+									"key": "instructor_name",
+									"value": "Jane Doe",
+									"type": "text"
+								},
+								{
+									"key": "instructor_designation",
+									"value": "Master Yoga Coach",
+									"type": "text"
+								},
+								{
+									"key": "instructor_image",
+									"type": "file",
+									"src": "postman-cloud:///1f12c7db-acfa-42e0-bdb6-853d20cd100b"
+								},
+								{
+									"key": "what_to_bring",
+									"value": "water",
+									"type": "text"
+								},
+								{
+									"key": "date",
+									"value": "2026-07-20",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "http://127.0.0.1:8000/studios/classes/",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8000",
+							"path": [
+								"studios",
+								"classes",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "List of SubAdmin",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzg1MjUzOTkzLCJpYXQiOjE3ODI2NjE5OTMsImp0aSI6IjJhNWQzYzBmZWEwYjRlZjM5ZTM2NTczYTk5NDEzZmQ1IiwidXNlcl9pZCI6IjkifQ.UOuGmyXI0KLgOyDWC4dmsv_OfdGiZXzsloMcb-E67T0",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": []
+						},
+						"url": {
+							"raw": "http://127.0.0.1:8000/studios/authenticated-users/",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8000",
+							"path": [
+								"studios",
+								"authenticated-users",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Class Review",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzg1NTgxNDMzLCJpYXQiOjE3ODI5ODk0MzMsImp0aSI6ImZjMDY4YjcyODJiOTQ5NzQ5MzkxOWY2Y2ZiMDNkZDExIiwidXNlcl9pZCI6IjEyIn0.MJMova4k8aAPGStCRX-dsFMcgxr8Dmh6GCHuMNPz9yw",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"rating\":\"4\",\n    \"comment\":\"Very helpful\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://127.0.0.1:8000/studios/classes/1/reviews/",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8000",
+							"path": [
+								"studios",
+								"classes",
+								"1",
+								"reviews",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "User Management",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzg2Nzg1NDIwLCJpYXQiOjE3ODQxOTM0MjAsImp0aSI6ImU0YTkwOGY1NjI2NjQ0MjA4NjMwZTQ3NWI4MjdkN2I4IiwidXNlcl9pZCI6IjEifQ.xyvbQXUsjAy3ezrqp-StyrYMVE3UYPGAihjxBAdcqtQ",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{fitness}}accounts/user/root-admin/users/",
+							"host": [
+								"{{fitness}}accounts"
+							],
+							"path": [
+								"user",
+								"root-admin",
+								"users",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Dashboard",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzg2Nzg1NDIwLCJpYXQiOjE3ODQxOTM0MjAsImp0aSI6ImU0YTkwOGY1NjI2NjQ0MjA4NjMwZTQ3NWI4MjdkN2I4IiwidXNlcl9pZCI6IjEifQ.xyvbQXUsjAy3ezrqp-StyrYMVE3UYPGAihjxBAdcqtQ",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{fitness}}accounts/user/root-admin/dashboard-stats/?year=2026",
+							"host": [
+								"{{fitness}}accounts"
+							],
+							"path": [
+								"user",
+								"root-admin",
+								"dashboard-stats",
+								""
+							],
+							"query": [
+								{
+									"key": "year",
+									"value": "2026"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Sub admin List",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzg2Nzg1NDIwLCJpYXQiOjE3ODQxOTM0MjAsImp0aSI6ImU0YTkwOGY1NjI2NjQ0MjA4NjMwZTQ3NWI4MjdkN2I4IiwidXNlcl9pZCI6IjEifQ.xyvbQXUsjAy3ezrqp-StyrYMVE3UYPGAihjxBAdcqtQ",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"is_active\": true\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{fitness}}accounts/user/root-admin/sub-admins/4/",
+							"host": [
+								"{{fitness}}accounts"
+							],
+							"path": [
+								"user",
+								"root-admin",
+								"sub-admins",
+								"4",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "All Bookings",
+					"request": {
+						"method": "GET",
+						"header": []
+					},
+					"response": []
+				},
+				{
+					"name": "All Classes for Root Admin",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzg2Nzg1NDIwLCJpYXQiOjE3ODQxOTM0MjAsImp0aSI6ImU0YTkwOGY1NjI2NjQ0MjA4NjMwZTQ3NWI4MjdkN2I4IiwidXNlcl9pZCI6IjEifQ.xyvbQXUsjAy3ezrqp-StyrYMVE3UYPGAihjxBAdcqtQ",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"is_active\": false\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{fitness}}studios/root-admin/classes/",
+							"host": [
+								"{{fitness}}studios"
+							],
+							"path": [
+								"root-admin",
+								"classes",
+								""
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "App",
+			"item": [
+				{
+					"name": "Filter Classes by Category",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzg1NTgxNDMzLCJpYXQiOjE3ODI5ODk0MzMsImp0aSI6ImZjMDY4YjcyODJiOTQ5NzQ5MzkxOWY2Y2ZiMDNkZDExIiwidXNlcl9pZCI6IjEyIn0.MJMova4k8aAPGStCRX-dsFMcgxr8Dmh6GCHuMNPz9yw",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://127.0.0.1:8000/studios/classes/?category=Yoga",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8000",
+							"path": [
+								"studios",
+								"classes",
+								""
+							],
+							"query": [
+								{
+									"key": "category",
+									"value": "Yoga"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Recommendations",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzg1NTgxNDMzLCJpYXQiOjE3ODI5ODk0MzMsImp0aSI6ImZjMDY4YjcyODJiOTQ5NzQ5MzkxOWY2Y2ZiMDNkZDExIiwidXNlcl9pZCI6IjEyIn0.MJMova4k8aAPGStCRX-dsFMcgxr8Dmh6GCHuMNPz9yw",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://127.0.0.1:8000/studios/classes/explore/",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8000",
+							"path": [
+								"studios",
+								"classes",
+								"explore",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Querying Nearby Studio",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzg1NzU4ODMyLCJpYXQiOjE3ODMxNjY4MzIsImp0aSI6ImMwMGZjOWU0ODExYzQyOWE4YzM1YzI0NmVmNTM5NTA3IiwidXNlcl9pZCI6IjEyIn0.HGOXvvvKPeh6e-SREt3XtFiVwxNT0vf8iWUypcKKrvU",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://127.0.0.1:8000/studios/nearby/?latitude=40.7128&longitude=-74.0060&radius=10.0",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8000",
+							"path": [
+								"studios",
+								"nearby",
+								""
+							],
+							"query": [
+								{
+									"key": "latitude",
+									"value": "40.7128"
+								},
+								{
+									"key": "longitude",
+									"value": "-74.0060"
+								},
+								{
+									"key": "radius",
+									"value": "10.0"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Favorite classes",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzg1NzU4ODMyLCJpYXQiOjE3ODMxNjY4MzIsImp0aSI6ImMwMGZjOWU0ODExYzQyOWE4YzM1YzI0NmVmNTM5NTA3IiwidXNlcl9pZCI6IjEyIn0.HGOXvvvKPeh6e-SREt3XtFiVwxNT0vf8iWUypcKKrvU",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "http://127.0.0.1:8000/studios/classes/1/favorite/",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8000",
+							"path": [
+								"studios",
+								"classes",
+								"1",
+								"favorite",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Fav Classes",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzg1NzU4ODMyLCJpYXQiOjE3ODMxNjY4MzIsImp0aSI6ImMwMGZjOWU0ODExYzQyOWE4YzM1YzI0NmVmNTM5NTA3IiwidXNlcl9pZCI6IjEyIn0.HGOXvvvKPeh6e-SREt3XtFiVwxNT0vf8iWUypcKKrvU",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://127.0.0.1:8000/studios/classes/favorites/",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8000",
+							"path": [
+								"studios",
+								"classes",
+								"favorites",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Fav. Stdio",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzg1NzU4ODMyLCJpYXQiOjE3ODMxNjY4MzIsImp0aSI6ImMwMGZjOWU0ODExYzQyOWE4YzM1YzI0NmVmNTM5NTA3IiwidXNlcl9pZCI6IjEyIn0.HGOXvvvKPeh6e-SREt3XtFiVwxNT0vf8iWUypcKKrvU",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "http://127.0.0.1:8000/studios/1/favorite/",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8000",
+							"path": [
+								"studios",
+								"1",
+								"favorite",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Fav. Stdio",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzg1NzU4ODMyLCJpYXQiOjE3ODMxNjY4MzIsImp0aSI6ImMwMGZjOWU0ODExYzQyOWE4YzM1YzI0NmVmNTM5NTA3IiwidXNlcl9pZCI6IjEyIn0.HGOXvvvKPeh6e-SREt3XtFiVwxNT0vf8iWUypcKKrvU",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://127.0.0.1:8000/studios/favorites/",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8000",
+							"path": [
+								"studios",
+								"favorites",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Stdios Details",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzg1NTg1MjU0LCJpYXQiOjE3ODI5OTMyNTQsImp0aSI6IjFhN2E2YzU2MTk3NTQ2MWVhYmUyNjZiZWQ1ZWEwOTgxIiwidXNlcl9pZCI6IjkifQ.UbqF8xm5-XNaXiLa-2ZhfLgznZyOTNCwGPy_e1G7_lE",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "name",
+									"value": "Vinyasa Flow",
+									"type": "text"
+								},
+								{
+									"key": "location",
+									"value": "Room A",
+									"type": "text"
+								},
+								{
+									"key": "category",
+									"value": "Yoga",
+									"type": "text"
+								},
+								{
+									"key": "description",
+									"value": "All levels welcome",
+									"type": "text"
+								},
+								{
+									"key": "recurrence",
+									"value": "weekly",
+									"type": "text"
+								},
+								{
+									"key": "start_time",
+									"value": "18:00:00",
+									"type": "text"
+								},
+								{
+									"key": "duration_minutes",
+									"value": "60",
+									"type": "text"
+								},
+								{
+									"key": "capacity",
+									"value": "25",
+									"type": "text"
+								},
+								{
+									"key": "price",
+									"value": "15.00",
+									"type": "text"
+								},
+								{
+									"key": "images",
+									"type": "file",
+									"src": [
+										"postman-cloud:///1f12c7db-acfa-42e0-bdb6-853d20cd100b",
+										"postman-cloud:///1f172245-7a16-44a0-915e-a3732c90b38f"
+									]
+								},
+								{
+									"key": "what_to_bring",
+									"value": "Yoga mat, towel",
+									"type": "text"
+								},
+								{
+									"key": "is_what_to_bring_required",
+									"value": "true",
+									"type": "text"
+								},
+								{
+									"key": "amenities",
+									"value": "Showers, Lockers",
+									"type": "text"
+								},
+								{
+									"key": "instructor_name",
+									"value": "Jane Doe",
+									"type": "text"
+								},
+								{
+									"key": "instructor_designation",
+									"value": "Master Yoga Coach",
+									"type": "text"
+								},
+								{
+									"key": "instructor_image",
+									"type": "file",
+									"src": "postman-cloud:///1f12c7db-acfa-42e0-bdb6-853d20cd100b"
+								},
+								{
+									"key": "what_to_bring",
+									"value": "water",
+									"type": "text"
+								},
+								{
+									"key": "date",
+									"value": "2026-07-20",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "http://127.0.0.1:8000/studios/3/",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8000",
+							"path": [
+								"studios",
+								"3",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Search by stdio|class|location",
+					"request": {
+						"method": "GET",
+						"header": []
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "SUBSCRIPTION APIs",
+			"item": [
+				{
+					"name": "plans",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzg1NTg1MjU0LCJpYXQiOjE3ODI5OTMyNTQsImp0aSI6IjFhN2E2YzU2MTk3NTQ2MWVhYmUyNjZiZWQ1ZWEwOTgxIiwidXNlcl9pZCI6IjkifQ.UbqF8xm5-XNaXiLa-2ZhfLgznZyOTNCwGPy_e1G7_lE",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "name",
+									"value": "Vinyasa Flow",
+									"type": "text"
+								},
+								{
+									"key": "location",
+									"value": "Room A",
+									"type": "text"
+								},
+								{
+									"key": "category",
+									"value": "Yoga",
+									"type": "text"
+								},
+								{
+									"key": "description",
+									"value": "All levels welcome",
+									"type": "text"
+								},
+								{
+									"key": "recurrence",
+									"value": "weekly",
+									"type": "text"
+								},
+								{
+									"key": "start_time",
+									"value": "18:00:00",
+									"type": "text"
+								},
+								{
+									"key": "duration_minutes",
+									"value": "60",
+									"type": "text"
+								},
+								{
+									"key": "capacity",
+									"value": "25",
+									"type": "text"
+								},
+								{
+									"key": "price",
+									"value": "15.00",
+									"type": "text"
+								},
+								{
+									"key": "images",
+									"type": "file",
+									"src": [
+										"postman-cloud:///1f12c7db-acfa-42e0-bdb6-853d20cd100b",
+										"postman-cloud:///1f172245-7a16-44a0-915e-a3732c90b38f"
+									]
+								},
+								{
+									"key": "what_to_bring",
+									"value": "Yoga mat, towel",
+									"type": "text"
+								},
+								{
+									"key": "is_what_to_bring_required",
+									"value": "true",
+									"type": "text"
+								},
+								{
+									"key": "amenities",
+									"value": "Showers, Lockers",
+									"type": "text"
+								},
+								{
+									"key": "instructor_name",
+									"value": "Jane Doe",
+									"type": "text"
+								},
+								{
+									"key": "instructor_designation",
+									"value": "Master Yoga Coach",
+									"type": "text"
+								},
+								{
+									"key": "instructor_image",
+									"type": "file",
+									"src": "postman-cloud:///1f12c7db-acfa-42e0-bdb6-853d20cd100b"
+								},
+								{
+									"key": "what_to_bring",
+									"value": "water",
+									"type": "text"
+								},
+								{
+									"key": "date",
+									"value": "2026-07-20",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "http://127.0.0.1:8000/subscriptions/plans/",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8000",
+							"path": [
+								"subscriptions",
+								"plans",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "My Subscriptions",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzg1NTg1MjU0LCJpYXQiOjE3ODI5OTMyNTQsImp0aSI6IjFhN2E2YzU2MTk3NTQ2MWVhYmUyNjZiZWQ1ZWEwOTgxIiwidXNlcl9pZCI6IjkifQ.UbqF8xm5-XNaXiLa-2ZhfLgznZyOTNCwGPy_e1G7_lE",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"plan_id\": 2,\n  \"payment_reference\": \"apple_pay_txn_abc123\",\n  \"use_free_trial\": true\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://127.0.0.1:8000/subscriptions/subscribe/",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8000",
+							"path": [
+								"subscriptions",
+								"subscribe",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Renew Subscription",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzg1NTg1MjU0LCJpYXQiOjE3ODI5OTMyNTQsImp0aSI6IjFhN2E2YzU2MTk3NTQ2MWVhYmUyNjZiZWQ1ZWEwOTgxIiwidXNlcl9pZCI6IjkifQ.UbqF8xm5-XNaXiLa-2ZhfLgznZyOTNCwGPy_e1G7_lE",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"payment_reference\": \"apple_pay_txn_monthly_xyz789\"\n}\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://127.0.0.1:8000/subscriptions/renew/",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8000",
+							"path": [
+								"subscriptions",
+								"renew",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Cancel Subscription",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzg1NTg1MjU0LCJpYXQiOjE3ODI5OTMyNTQsImp0aSI6IjFhN2E2YzU2MTk3NTQ2MWVhYmUyNjZiZWQ1ZWEwOTgxIiwidXNlcl9pZCI6IjkifQ.UbqF8xm5-XNaXiLa-2ZhfLgznZyOTNCwGPy_e1G7_lE",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"payment_reference\": \"apple_pay_txn_monthly_xyz789\"\n}\n"
+						},
+						"url": {
+							"raw": "http://127.0.0.1:8000/subscriptions/cancel/",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8000",
+							"path": [
+								"subscriptions",
+								"cancel",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "List One-Time Credit Packs",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzg1NTg1MjU0LCJpYXQiOjE3ODI5OTMyNTQsImp0aSI6IjFhN2E2YzU2MTk3NTQ2MWVhYmUyNjZiZWQ1ZWEwOTgxIiwidXNlcl9pZCI6IjkifQ.UbqF8xm5-XNaXiLa-2ZhfLgznZyOTNCwGPy_e1G7_lE",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"payment_reference\": \"apple_pay_txn_monthly_xyz789\"\n}\n"
+						},
+						"url": {
+							"raw": "http://127.0.0.1:8000/subscriptions/credit-packs/",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8000",
+							"path": [
+								"subscriptions",
+								"credit-packs",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Purchase Credits (One-Time Pack)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzg1NTg1MjU0LCJpYXQiOjE3ODI5OTMyNTQsImp0aSI6IjFhN2E2YzU2MTk3NTQ2MWVhYmUyNjZiZWQ1ZWEwOTgxIiwidXNlcl9pZCI6IjkifQ.UbqF8xm5-XNaXiLa-2ZhfLgznZyOTNCwGPy_e1G7_lE",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"pack_id\": 2,\n  \"payment_reference\": \"google_pay_txn_def456\"\n}\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://127.0.0.1:8000/subscriptions/buy-credits/",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8000",
+							"path": [
+								"subscriptions",
+								"buy-credits",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Credit Status",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzg1NTg1MjU0LCJpYXQiOjE3ODI5OTMyNTQsImp0aSI6IjFhN2E2YzU2MTk3NTQ2MWVhYmUyNjZiZWQ1ZWEwOTgxIiwidXNlcl9pZCI6IjkifQ.UbqF8xm5-XNaXiLa-2ZhfLgznZyOTNCwGPy_e1G7_lE",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"pack_id\": 2,\n  \"payment_reference\": \"google_pay_txn_def456\"\n}\n"
+						},
+						"url": {
+							"raw": "http://127.0.0.1:8000/subscriptions/credit-status/",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8000",
+							"path": [
+								"subscriptions",
+								"credit-status",
+								""
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "CLASS BOOKING APIs",
+			"item": [
+				{
+					"name": "Book a Class",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzg1NTg1MjU0LCJpYXQiOjE3ODI5OTMyNTQsImp0aSI6IjFhN2E2YzU2MTk3NTQ2MWVhYmUyNjZiZWQ1ZWEwOTgxIiwidXNlcl9pZCI6IjkifQ.UbqF8xm5-XNaXiLa-2ZhfLgznZyOTNCwGPy_e1G7_lE",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"class_id\": 5\n}\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://127.0.0.1:8000/bookings/book/",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8000",
+							"path": [
+								"bookings",
+								"book",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get My Bookings",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzg1NTg1MjU0LCJpYXQiOjE3ODI5OTMyNTQsImp0aSI6IjFhN2E2YzU2MTk3NTQ2MWVhYmUyNjZiZWQ1ZWEwOTgxIiwidXNlcl9pZCI6IjkifQ.UbqF8xm5-XNaXiLa-2ZhfLgznZyOTNCwGPy_e1G7_lE",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://127.0.0.1:8000/bookings/",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8000",
+							"path": [
+								"bookings",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Cancel a Booking",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzg1NTg1MjU0LCJpYXQiOjE3ODI5OTMyNTQsImp0aSI6IjFhN2E2YzU2MTk3NTQ2MWVhYmUyNjZiZWQ1ZWEwOTgxIiwidXNlcl9pZCI6IjkifQ.UbqF8xm5-XNaXiLa-2ZhfLgznZyOTNCwGPy_e1G7_lE",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "http://127.0.0.1:8000/bookings/1/cancel/",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8000",
+							"path": [
+								"bookings",
+								"1",
+								"cancel",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Booking Status",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzg1NTg1MjU0LCJpYXQiOjE3ODI5OTMyNTQsImp0aSI6IjFhN2E2YzU2MTk3NTQ2MWVhYmUyNjZiZWQ1ZWEwOTgxIiwidXNlcl9pZCI6IjkifQ.UbqF8xm5-XNaXiLa-2ZhfLgznZyOTNCwGPy_e1G7_lE",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://10.10.28.93:8000/bookings/status/",
+							"protocol": "http",
+							"host": [
+								"10",
+								"10",
+								"28",
+								"93"
+							],
+							"port": "8000",
+							"path": [
+								"bookings",
+								"status",
+								""
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"requests": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"requests": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "fitness",
+			"value": ""
+		}
+	]
+}

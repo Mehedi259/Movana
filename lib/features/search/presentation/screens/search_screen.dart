@@ -355,7 +355,9 @@ class _SearchResultCard extends StatelessWidget {
                 color: const Color(0xFFECEEEA),
                 borderRadius: BorderRadius.circular(8),
                 image: DecorationImage(
-                  image: AssetImage(imagePath),
+                  image: imagePath.startsWith('http')
+                      ? NetworkImage(imagePath) as ImageProvider
+                      : AssetImage(imagePath),
                   fit: BoxFit.cover,
                 ),
               ),

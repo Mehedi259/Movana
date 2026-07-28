@@ -2,9 +2,56 @@ import 'package:flutter/material.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_routes.dart';
 import '../../../../shared/widgets/custom_bottom_nav_bar.dart';
+import '../../../profile/services/profile_service.dart';
+import '../../services/home_service.dart';
+import '../../../../core/constants/api_constants.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  bool _isLoading = true;
+  String _userName = 'User';
+  String _credits = '0';
+  List<dynamic> _classes = [];
+  List<dynamic> _studios = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchData();
+  }
+
+  Future<void> _fetchData() async {
+    try {
+      final profileFuture = ProfileService.getProfile();
+      final creditsFuture = HomeService.getCreditStatus().catchError((_) => <String, dynamic>{});
+      final classesFuture = HomeService.getClasses().catchError((_) => <dynamic>[]);
+      final studiosFuture = HomeService.getStudios().catchError((_) => <dynamic>[]);
+
+      final results = await Future.wait([profileFuture, creditsFuture, classesFuture, studiosFuture]);
+
+      if (mounted) {
+        setState(() {
+          final profile = results[0] as Map<String, dynamic>;
+          final creditsData = results[1] as Map<String, dynamic>;
+          _classes = results[2] as List<dynamic>;
+          _studios = results[3] as List<dynamic>;
+
+          _userName = profile['name']?.toString() ?? 'User';
+          _credits = creditsData['remaining_credits']?.toString() ?? creditsData['credits']?.toString() ?? '0';
+          _isLoading = false;
+        });
+      }
+    } catch (e) {
+      print('Error loading home data: $e');
+      if (mounted) setState(() => _isLoading = false);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -12,13 +59,18 @@ class HomeScreen extends StatelessWidget {
       extendBody: true,
       backgroundColor: AppColors.background,
       body: SafeArea(
-        child: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const SizedBox(height: 16),
+        child: _isLoading 
+          ? const Center(child: CircularProgressIndicator())
+          : RefreshIndicator(
+              onRefresh: _fetchData,
+              child: SingleChildScrollView(
+                physics: const AlwaysScrollableScrollPhysics(),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const SizedBox(height: 16),
                 // Header
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -53,7 +105,7 @@ class HomeScreen extends StatelessWidget {
                           ),
                           const SizedBox(height: 4),
                           Text(
-                            'Good Evening, Alex',
+                            'Good Evening, $_userName',
                             style: TextStyle(
                               color: AppColors.textPrimary,
                               fontSize: 18,
@@ -76,7 +128,7 @@ class HomeScreen extends StatelessWidget {
                         borderRadius: BorderRadius.circular(14),
                       ),
                       child: Text(
-                        '120 Credits',
+                        '$_credits Credits',
                         style: TextStyle(
                           color: AppColors.textSecondary,
                           fontSize: 10,
@@ -114,7 +166,7 @@ class HomeScreen extends StatelessWidget {
                             const SizedBox(width: 6),
                             Flexible(
                               child: Text(
-                                '12 credits remaining',
+                                '$_credits credits remaining',
                                 style: TextStyle(
                                   color: AppColors.textDark,
                                   fontSize: 12,
@@ -337,12 +389,12 @@ class HomeScreen extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 24),
-                // Trending Near You
+                // Trending Near You (Classes)
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      'Trending Near You',
+                      'Trending Classes Near You',
                       style: TextStyle(
                         color: AppColors.textPrimary,
                         fontSize: 16,
@@ -369,55 +421,45 @@ class HomeScreen extends StatelessWidget {
                   ],
                 ),
                 const SizedBox(height: 12),
-                SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
+                if (_classes.isEmpty)
+                  const Padding(
+                    padding: EdgeInsets.symmetric(vertical: 20),
+                    child: Center(child: Text('No classes found')),
+                  )
+                else
+                  SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
                   child: Row(
-                    children: [
-                      _StudioCard(
-                        name: 'Zen Flow Studio',
-                        category: 'Yoga & Meditation',
-                        rating: 4.9,
-                        credits: '2-3 cr',
-                        distance: '0.5 km',
-                        imagePath: 'assets/ZenFlowStudio.png',
-                        onTap: () {
-                          Navigator.pushNamed(context, AppRoutes.studioDetails);
-                        },
-                      ),
-                      const SizedBox(width: 8),
-                      _StudioCard(
-                        name: 'FitForce Gym',
-                        category: 'Strength & HIIT',
-                        rating: 4.9,
-                        credits: '1-2 cr',
-                        distance: '1.2 km',
-                        imagePath: 'assets/FitForseGym.png',
-                        onTap: () {
-                          Navigator.pushNamed(context, AppRoutes.studioDetails);
-                        },
-                      ),
-                      const SizedBox(width: 8),
-                      _StudioCard(
-                        name: 'FitForce Gym',
-                        category: 'Strength & HIIT',
-                        rating: 4.9,
-                        credits: '1-2 cr',
-                        distance: '1.2 km',
-                        imagePath: 'assets/FitforceGym2.png',
-                        onTap: () {
-                          Navigator.pushNamed(context, AppRoutes.studioDetails);
-                        },
-                      ),
-                    ],
+                    children: _classes.map((cls) {
+                      return Padding(
+                        padding: const EdgeInsets.only(right: 8.0),
+                        child: SizedBox(
+                          width: 300, // Fixed width for horizontal scrolling classes
+                          child: _ClassListItem(
+                            name: cls['name']?.toString() ?? 'Class Name',
+                            studio: cls['studio_name']?.toString() ?? 'Studio',
+                            time: cls['start_time']?.toString() ?? 'Time',
+                            credits: '${cls['price'] ?? 0} cr',
+                            spotsLeft: '${cls['capacity'] ?? 0} spots left',
+                            imagePath: (cls['images'] != null && (cls['images'] as List).isNotEmpty)
+                                ? (cls['images'][0]['image'] ?? '')
+                                : 'assets/Morning.png',
+                            onTap: () {
+                              Navigator.pushNamed(context, AppRoutes.classDetails);
+                            },
+                          ),
+                        ),
+                      );
+                    }).toList(),
                   ),
                 ),
                 const SizedBox(height: 24),
-                // Recommended
+                // Recommended Studios
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      'Recommended',
+                      'Recommended Studios',
                       style: TextStyle(
                         color: AppColors.textDark,
                         fontSize: 16,
@@ -439,47 +481,35 @@ class HomeScreen extends StatelessWidget {
                   ],
                 ),
                 const SizedBox(height: 12),
-                _ClassListItem(
-                  name: 'Morning Vinyasa Flow',
-                  studio: 'Zen Flow Studio',
-                  time: '07:00 AM',
-                  credits: '2 cr',
-                  spotsLeft: '4 spots left',
-                  imagePath: 'assets/Morning.png',
-                  onTap: () {
-                    Navigator.pushNamed(context, AppRoutes.classDetails);
-                  },
-                ),
-                const SizedBox(height: 12),
-                _ClassListItem(
-                  name: 'Kickboxing Power',
-                  studio: 'FitForce Gym',
-                  time: '06:30 PM',
-                  credits: '3 cr',
-                  spotsLeft: 'Full',
-                  imagePath: 'assets/Kickboxing.png',
-                  onTap: () {
-                    Navigator.pushNamed(context, AppRoutes.classDetails);
-                  },
-                ),
-                const SizedBox(height: 12),
-                _ClassListItem(
-                  name: 'Reformer Pilates',
-                  studio: 'PurePilates Studio',
-                  time: '12:00 PM',
-                  credits: '3 cr',
-                  spotsLeft: '2 spots left',
-                  imagePath: 'assets/reformer.png',
-                  onTap: () {
-                    Navigator.pushNamed(context, AppRoutes.classDetails);
-                  },
-                ),
+                if (_studios.isEmpty)
+                  const Padding(
+                    padding: EdgeInsets.symmetric(vertical: 20),
+                    child: Center(child: Text('No studios found')),
+                  )
+                else
+                  ..._studios.map((studio) {
+                    return Padding(
+                      padding: const EdgeInsets.only(bottom: 12.0),
+                      child: _ClassListItem(
+                        name: studio['name']?.toString() ?? 'Studio Name',
+                        studio: studio['primary_category']?.toString() ?? 'Category',
+                        time: studio['full_address']?.toString() ?? 'Near you',
+                        credits: '1-3 cr',
+                        spotsLeft: 'Open',
+                        imagePath: 'assets/ZenFlowStudio.png', // Temporary hardcoded since cover_photo might be a full URL, but AssetImage needs local
+                        onTap: () {
+                          Navigator.pushNamed(context, AppRoutes.studioDetails);
+                        },
+                      ),
+                    );
+                  }),
                 const SizedBox(height: 100),
               ],
             ),
           ),
         ),
       ),
+    ),
       bottomNavigationBar: const CustomBottomNavBar(currentIndex: 0),
     );
   }
@@ -582,7 +612,9 @@ class _StudioCard extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
               decoration: BoxDecoration(
                 image: DecorationImage(
-                  image: AssetImage(imagePath),
+                  image: imagePath.startsWith('http')
+                      ? NetworkImage(imagePath) as ImageProvider
+                      : AssetImage(imagePath),
                   fit: BoxFit.cover,
                 ),
               ),
@@ -730,7 +762,9 @@ class _ClassListItem extends StatelessWidget {
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(8),
                 image: DecorationImage(
-                  image: AssetImage(imagePath),
+                  image: imagePath.startsWith('http')
+                      ? NetworkImage(imagePath) as ImageProvider
+                      : AssetImage(imagePath),
                   fit: BoxFit.cover,
                 ),
               ),
