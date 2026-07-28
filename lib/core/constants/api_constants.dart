@@ -13,8 +13,16 @@ class ApiConstants {
   static const String logout = '$baseUrl/accounts/user/logout/';
   static const String deleteAccount = '$baseUrl/accounts/user/delete-account/';
   
-  // Home/Studio Endpoints
+  // Subscription endpoints
+  static const String subscriptionPlans = '$baseUrl/subscriptions/plans/';
+  static const String subscribe = '$baseUrl/subscriptions/subscribe/';
+  static const String mySubscription = '$baseUrl/subscriptions/my-subscription/';
   static const String creditStatus = '$baseUrl/subscriptions/credit-status/';
+
+  // Bookings endpoints
+  static const String bookClass = '$baseUrl/bookings/book/';
+  
+  // Home/Studio Endpoints
   static const String classes = '$baseUrl/studios/classes/explore/';
   static String classDetails(int id) => '$baseUrl/studios/classes/$id/';
   static const String studios = '$baseUrl/studios/nearby/?latitude=23.8103&longitude=90.4125&radius=10000';

@@ -435,7 +435,11 @@ class _ClassDetailsEnhancedScreenState extends State<ClassDetailsEnhancedScreen>
                       Expanded(
                         child: ElevatedButton(
                           onPressed: () {
-                            Navigator.pushNamed(context, AppRoutes.reservation);
+                            Navigator.pushNamed(
+                              context, 
+                              AppRoutes.reservation, 
+                              arguments: widget.classId,
+                            );
                           },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: AppColors.primary,

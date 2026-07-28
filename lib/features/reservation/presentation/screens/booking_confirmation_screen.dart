@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import '../../../../core/constants/app_routes.dart';
 
 class BookingConfirmationScreen extends StatefulWidget {
-  const BookingConfirmationScreen({super.key});
+  final Map<String, dynamic>? bookingData;
+  const BookingConfirmationScreen({super.key, this.bookingData});
 
   @override
   State<BookingConfirmationScreen> createState() => _BookingConfirmationScreenState();
@@ -11,6 +12,26 @@ class BookingConfirmationScreen extends StatefulWidget {
 class _BookingConfirmationScreenState extends State<BookingConfirmationScreen> {
   @override
   Widget build(BuildContext context) {
+    final data = widget.bookingData ?? {};
+    final studioClass = data['studio_class'] ?? {};
+    final studio = data['studio'] ?? {};
+    
+    final className = studioClass['name'] ?? 'Class';
+    final studioName = studio['name'] ?? 'Studio';
+    final instructorName = studioClass['instructor_name'] ?? 'Instructor';
+    final dateStr = studioClass['date'] ?? 'Date';
+    final startTimeStr = studioClass['start_time'] ?? 'Time';
+    
+    // Formatting time roughly
+    String formatTime(String time) {
+      if (time.length >= 5) return time.substring(0, 5);
+      return time;
+    }
+    final formattedTime = formatTime(startTimeStr);
+    
+    final creditsUsed = data['credits_used'] ?? 0;
+    final balanceAfter = data['credits_available'] ?? 0;
+
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -71,10 +92,10 @@ class _BookingConfirmationScreenState extends State<BookingConfirmationScreen> {
               ),
             ),
             const SizedBox(height: 12),
-            const Text(
-              'See you at Reformer Pilates on Monday, Mar 16\nat 7:00 AM. A confirmation has been sent to\nyour email.',
+            Text(
+              'See you at $className on $dateStr\nat $formattedTime. A confirmation has been sent to\nyour email.',
               textAlign: TextAlign.center,
-              style: TextStyle(
+              style: const TextStyle(
                 color: Color(0xFF404943),
                 fontSize: 14,
                 fontFamily: 'Lexend',
@@ -107,33 +128,33 @@ class _BookingConfirmationScreenState extends State<BookingConfirmationScreen> {
                   _buildSummaryRow(
                     icon: Icons.fitness_center,
                     label: 'Class',
-                    value: 'Reformer Pilates',
+                    value: className,
                   ),
                   const SizedBox(height: 12),
                   _buildSummaryRow(
                     icon: Icons.location_on_outlined,
                     label: 'Studio',
-                    value: 'Zen Flow Studio',
+                    value: studioName,
                   ),
                   const SizedBox(height: 12),
                   _buildSummaryRow(
                     icon: Icons.person_outline,
                     label: 'Instructor',
-                    value: 'Giovanna',
+                    value: instructorName,
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 12),
                   _buildSummaryRow(
                     icon: Icons.calendar_today_outlined,
                     label: 'Date & Time',
-                    value: 'Mon, Mar 16\n7:00 – 7:50 AM',
+                    value: '$dateStr\n$formattedTime',
                   ),
                   const SizedBox(height: 16),
                   const Divider(color: Color(0xFFBFC9C1), height: 1),
                   const SizedBox(height: 16),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: const [
-                      Text(
+                    children: [
+                      const Text(
                         'Credits Used',
                         style: TextStyle(
                           color: Color(0xFF404943),
@@ -143,8 +164,8 @@ class _BookingConfirmationScreenState extends State<BookingConfirmationScreen> {
                         ),
                       ),
                       Text(
-                        '-02 credits',
-                        style: TextStyle(
+                        '-${creditsUsed.toString().padLeft(2, '0')} credits',
+                        style: const TextStyle(
                           color: Color(0xFF93000A),
                           fontSize: 14,
                           fontFamily: 'Lexend',
@@ -176,9 +197,9 @@ class _BookingConfirmationScreenState extends State<BookingConfirmationScreen> {
                           ),
                         ],
                       ),
-                      const Text(
-                        '100 credits',
-                        style: TextStyle(
+                      Text(
+                        '${balanceAfter.toString().padLeft(2, '0')} credits',
+                        style: const TextStyle(
                           color: Color(0xFF0F5238),
                           fontSize: 14,
                           fontFamily: 'Lexend',

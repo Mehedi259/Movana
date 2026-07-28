@@ -84,7 +84,8 @@ class AppRouter {
         final classId = settings.arguments as int?;
         return MaterialPageRoute(builder: (_) => ClassDetailsEnhancedScreen(classId: classId));
       case AppRoutes.reservation:
-        return MaterialPageRoute(builder: (_) => const ReservationScreen());
+        final classId = settings.arguments as int?;
+        return MaterialPageRoute(builder: (_) => ReservationScreen(classId: classId));
       
       // Profile Settings Routes
       case AppRoutes.editProfile:
@@ -130,7 +131,8 @@ class AppRouter {
       case AppRoutes.searchMap:
         return MaterialPageRoute(builder: (_) => const SearchMapScreen());
       case AppRoutes.bookingConfirmation:
-        return MaterialPageRoute(builder: (_) => const BookingConfirmationScreen());
+        final bookingData = settings.arguments as Map<String, dynamic>?;
+        return MaterialPageRoute(builder: (_) => BookingConfirmationScreen(bookingData: bookingData));
       
       default:
         return MaterialPageRoute(

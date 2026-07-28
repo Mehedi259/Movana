@@ -26,6 +26,19 @@ class ProfileService {
     }
   }
 
+  static Future<Map<String, dynamic>> getCreditStatus() async {
+    try {
+      final response = await http.get(
+        Uri.parse(ApiConstants.creditStatus),
+        headers: await _getHeaders(),
+      );
+      return _processResponse(response);
+    } catch (e) {
+      _handleException(e);
+      rethrow;
+    }
+  }
+
   static Future<Map<String, dynamic>> updateProfile(Map<String, dynamic> data, {File? imageFile}) async {
     try {
       if (imageFile != null) {

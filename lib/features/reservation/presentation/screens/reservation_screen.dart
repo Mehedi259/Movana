@@ -1,9 +1,14 @@
 import 'package:flutter/material.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_routes.dart';
+import '../../../../core/constants/api_constants.dart';
+import '../../../studio/services/studio_service.dart';
+import '../../../profile/services/profile_service.dart';
+import '../../services/booking_service.dart';
 
 class ReservationScreen extends StatefulWidget {
-  const ReservationScreen({super.key});
+  final int? classId;
+  const ReservationScreen({super.key, this.classId});
 
   @override
   State<ReservationScreen> createState() => _ReservationScreenState();
@@ -11,22 +16,105 @@ class ReservationScreen extends StatefulWidget {
 
 class _ReservationScreenState extends State<ReservationScreen> {
   bool _isLoading = false;
+  bool _isDataLoading = true;
+  Map<String, dynamic>? _classDetails;
+  Map<String, dynamic>? _creditStatus;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadData();
+  }
+
+  Future<void> _loadData() async {
+    if (widget.classId == null) {
+      setState(() => _isDataLoading = false);
+      return;
+    }
+    try {
+      final classFuture = StudioService.getClassDetails(widget.classId!);
+      final creditFuture = ProfileService.getCreditStatus();
+      
+      final results = await Future.wait([classFuture, creditFuture]);
+      
+      if (mounted) {
+        setState(() {
+          _classDetails = results[0];
+          _creditStatus = results[1];
+          _isDataLoading = false;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() => _isDataLoading = false);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to load data: $e')),
+        );
+      }
+    }
+  }
 
   Future<void> _handleBooking() async {
+    if (widget.classId == null) return;
     setState(() => _isLoading = true);
-    await Future.delayed(const Duration(seconds: 2));
-    if (mounted) {
-      setState(() => _isLoading = false);
-      // Navigate to the Booking Confirmation screen
-      Navigator.pushNamed(
-        context,
-        AppRoutes.bookingConfirmation,
-      );
+    
+    try {
+      final result = await BookingService.bookClass(widget.classId!);
+      if (mounted) {
+        setState(() => _isLoading = false);
+        Navigator.pushNamed(
+          context,
+          AppRoutes.bookingConfirmation,
+          arguments: result['booking'],
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() => _isLoading = false);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(e.toString())),
+        );
+      }
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    if (_isDataLoading) {
+      return const Scaffold(
+        backgroundColor: Colors.white,
+        body: Center(child: CircularProgressIndicator()),
+      );
+    }
+
+    final classData = _classDetails ?? {};
+    final studioData = classData['studio'] ?? {};
+    final creditData = _creditStatus ?? {};
+
+    final className = classData['name'] ?? 'Class Name';
+    final studioName = studioData['name'] ?? 'Studio Name';
+    final dateStr = classData['date'] ?? 'Date';
+    final startTimeStr = classData['start_time'] ?? '00:00:00';
+    final endTimeStr = classData['end_time'] ?? '00:00:00';
+    
+    // Formatting time roughly
+    String formatTime(String time) {
+      if (time.length >= 5) return time.substring(0, 5);
+      return time;
+    }
+    final timeStr = '${formatTime(startTimeStr)} - ${formatTime(endTimeStr)}';
+
+    final classCost = (classData['credits_required'] ?? 2).toInt();
+    final userBalance = (creditData['total_available'] ?? 0).toInt();
+    final balanceAfter = userBalance - classCost;
+    
+    final bool hasEnoughCredits = balanceAfter >= 0;
+
+    String? imageUrl;
+    if (classData['images'] != null && (classData['images'] as List).isNotEmpty) {
+      imageUrl = (classData['images'] as List).first['image'];
+    }
+
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -72,10 +160,16 @@ class _ReservationScreenState extends State<ReservationScreen> {
             left: 0,
             right: 0,
             height: 280,
-            child: Image.asset(
-              'assets/Reformer Pilates.png',
-              fit: BoxFit.cover,
-            ),
+            child: imageUrl != null 
+              ? Image.network(
+                  ApiConstants.baseUrl.replaceAll('/api/v1', '') + imageUrl,
+                  fit: BoxFit.cover,
+                  errorBuilder: (context, error, stackTrace) => Container(color: Colors.grey[200]),
+                )
+              : Image.asset(
+                  'assets/Reformer Pilates.png',
+                  fit: BoxFit.cover,
+                ),
           ),
 
           // Scrollable Content overlaying the image
@@ -176,21 +270,29 @@ class _ReservationScreenState extends State<ReservationScreen> {
                             children: [
                               ClipRRect(
                                 borderRadius: BorderRadius.circular(12),
-                                child: Image.asset(
-                                  'assets/Reformer Pilates.png',
-                                  width: 60,
-                                  height: 60,
-                                  fit: BoxFit.cover,
-                                ),
+                                child: imageUrl != null 
+                                  ? Image.network(
+                                      ApiConstants.baseUrl.replaceAll('/api/v1', '') + imageUrl,
+                                      width: 60,
+                                      height: 60,
+                                      fit: BoxFit.cover,
+                                      errorBuilder: (context, error, stackTrace) => Container(color: Colors.grey[200], width: 60, height: 60),
+                                    )
+                                  : Image.asset(
+                                      'assets/Reformer Pilates.png',
+                                      width: 60,
+                                      height: 60,
+                                      fit: BoxFit.cover,
+                                    ),
                               ),
                               const SizedBox(width: 16),
                               Expanded(
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    const Text(
-                                      'Reformer Pilates',
-                                      style: TextStyle(
+                                    Text(
+                                      className,
+                                      style: const TextStyle(
                                         color: Color(0xFF191C1A),
                                         fontSize: 17,
                                         fontFamily: 'Lexend',
@@ -198,9 +300,9 @@ class _ReservationScreenState extends State<ReservationScreen> {
                                       ),
                                     ),
                                     const SizedBox(height: 4),
-                                    const Text(
-                                      'Tomorrow, 10:00 AM - 10:50 AM',
-                                      style: TextStyle(
+                                    Text(
+                                      '$dateStr, $timeStr',
+                                      style: const TextStyle(
                                         color: Color(0xFF404943),
                                         fontSize: 14,
                                         fontFamily: 'Lexend',
@@ -209,16 +311,16 @@ class _ReservationScreenState extends State<ReservationScreen> {
                                     ),
                                     const SizedBox(height: 4),
                                     Row(
-                                      children: const [
-                                        Icon(
+                                      children: [
+                                        const Icon(
                                           Icons.location_on,
                                           size: 14,
                                           color: Color(0xFF0F5238),
                                         ),
-                                        SizedBox(width: 4),
+                                        const SizedBox(width: 4),
                                         Text(
-                                          'Zen Flow Studio',
-                                          style: TextStyle(
+                                          studioName,
+                                          style: const TextStyle(
                                             color: Color(0xFF404943),
                                             fontSize: 14,
                                             fontFamily: 'Lexend',
@@ -286,13 +388,13 @@ class _ReservationScreenState extends State<ReservationScreen> {
                             children: [
                               _buildCostRow(
                                 'Class cost',
-                                '2 credits',
+                                '$classCost credits',
                                 isValueBold: true,
                               ),
                               const SizedBox(height: 12),
                               _buildCostRow(
                                 'Your balance',
-                                '40 credits',
+                                '$userBalance credits',
                                 isValueBold: true,
                               ),
                               const Padding(
@@ -305,8 +407,8 @@ class _ReservationScreenState extends State<ReservationScreen> {
                               Row(
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
-                                children: const [
-                                  Text(
+                                children: [
+                                  const Text(
                                     'Balance after',
                                     style: TextStyle(
                                       color: Color(0xFF191C1A),
@@ -316,9 +418,9 @@ class _ReservationScreenState extends State<ReservationScreen> {
                                     ),
                                   ),
                                   Text(
-                                    '38 credits',
+                                    '$balanceAfter credits',
                                     style: TextStyle(
-                                      color: Color(0xFF0F5238),
+                                      color: hasEnoughCredits ? const Color(0xFF0F5238) : Colors.red,
                                       fontSize: 16,
                                       fontFamily: 'Lexend',
                                       fontWeight: FontWeight.w600,
@@ -360,53 +462,42 @@ class _ReservationScreenState extends State<ReservationScreen> {
                         // Confirm Button
                         SizedBox(
                           width: double.infinity,
-                          child: GestureDetector(
-                            onTap: _isLoading ? null : _handleBooking,
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(vertical: 16),
-                              decoration: BoxDecoration(
-                                gradient: AppColors.primaryGradient,
-                                borderRadius: BorderRadius.circular(100),
-                                boxShadow: const [
-                                  BoxShadow(
-                                    color: Color(0x3F2D6A4F),
-                                    blurRadius: 16,
-                                    offset: Offset(0, 4),
-                                  )
-                                ],
+                          height: 56,
+                          child: ElevatedButton(
+                            onPressed: (_isLoading || !hasEnoughCredits) ? null : _handleBooking,
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: const Color(0xFF0F5238),
+                              foregroundColor: Colors.white,
+                              elevation: 0,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(28),
                               ),
-                              child: _isLoading
-                                  ? const Center(
-                                      child: SizedBox(
-                                        width: 24,
-                                        height: 24,
-                                        child: CircularProgressIndicator(
-                                          strokeWidth: 2,
-                                          color: Colors.white,
+                              disabledBackgroundColor: const Color(0xFF0F5238).withValues(alpha: 0.5),
+                            ),
+                            child: _isLoading
+                                ? const SizedBox(
+                                    height: 24,
+                                    width: 24,
+                                    child: CircularProgressIndicator(
+                                      color: Colors.white,
+                                      strokeWidth: 2,
+                                    ),
+                                  )
+                                : Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: const [
+                                      Icon(Icons.check, size: 20),
+                                      SizedBox(width: 8),
+                                      Text(
+                                        'Confirm Reservation',
+                                        style: TextStyle(
+                                          fontSize: 16,
+                                          fontFamily: 'Nunito Sans',
+                                          fontWeight: FontWeight.w700,
                                         ),
                                       ),
-                                    )
-                                  : Row(
-                                      mainAxisAlignment: MainAxisAlignment.center,
-                                      children: const [
-                                        Icon(
-                                          Icons.check,
-                                          color: Colors.white,
-                                          size: 18,
-                                        ),
-                                        SizedBox(width: 8),
-                                        Text(
-                                          'Confirm Reservation',
-                                          style: TextStyle(
-                                            color: Colors.white,
-                                            fontSize: 15,
-                                            fontFamily: 'Lexend',
-                                            fontWeight: FontWeight.w500,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                            ),
+                                    ],
+                                  ),
                           ),
                         ),
                       ],
