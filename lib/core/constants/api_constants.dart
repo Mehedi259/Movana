@@ -17,4 +17,5 @@ class ApiConstants {
   static const String creditStatus = '$baseUrl/subscriptions/credit-status/';
   static const String classes = '$baseUrl/studios/classes/explore/';
   static const String studios = '$baseUrl/studios/nearby/?latitude=23.8103&longitude=90.4125&radius=10000';
+  static String studioDetails(int id) => '$baseUrl/studios/$id/';
 }

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import '../../../../core/constants/app_routes.dart';
+import '../../../home/services/home_service.dart';
 
 class ClassScheduleScreen extends StatefulWidget {
   const ClassScheduleScreen({super.key});
@@ -9,11 +11,103 @@ class ClassScheduleScreen extends StatefulWidget {
 }
 
 class _ClassScheduleScreenState extends State<ClassScheduleScreen> {
-  String _selectedDay = 'Today';
+  String _selectedDay = 'All';
   String _selectedCategory = 'All';
+  bool _isLoading = true;
+  String? _error;
 
-  final List<String> _days = ['All', 'Today', 'Tue-28', 'Wed-29', 'Thu-30', 'Fri-31'];
-  final List<String> _categories = ['All', 'Yoga', 'Pilates', 'Gym', 'HIIT', 'Spin'];
+  List<dynamic> _allClasses = [];
+  List<String> _days = ['All'];
+  List<String> _categories = ['All'];
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchClasses();
+  }
+
+  Future<void> _fetchClasses() async {
+    try {
+      setState(() {
+        _isLoading = true;
+        _error = null;
+      });
+      final classes = await HomeService.getClasses();
+      
+      // Generate next 7 days
+      final now = DateTime.now();
+      _days = ['All', 'Today'];
+      for (int i = 1; i <= 6; i++) {
+        final date = now.add(Duration(days: i));
+        _days.add(DateFormat('EEE-dd').format(date)); // e.g. Tue-28
+      }
+
+      // Extract unique categories
+      final Set<String> uniqueCategories = {'All'};
+      for (var cls in classes) {
+        final category = cls['category']?.toString();
+        if (category != null && category.isNotEmpty) {
+          uniqueCategories.add(category);
+        }
+      }
+
+      setState(() {
+        _allClasses = classes;
+        _categories = uniqueCategories.toList();
+        _isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        _error = e.toString();
+        _isLoading = false;
+      });
+    }
+  }
+
+  List<dynamic> get _filteredClasses {
+    return _allClasses.where((cls) {
+      // Filter by category
+      if (_selectedCategory != 'All') {
+        if (cls['category']?.toString() != _selectedCategory) {
+          return false;
+        }
+      }
+
+      // Filter by day
+      if (_selectedDay != 'All') {
+        if (_selectedDay == 'Today') {
+          // Compare with today's date
+          final clsDateStr = cls['date']?.toString();
+          if (clsDateStr != null) {
+            final clsDate = DateTime.tryParse(clsDateStr);
+            final today = DateTime.now();
+            if (clsDate == null || clsDate.year != today.year || clsDate.month != today.month || clsDate.day != today.day) {
+              return false;
+            }
+          } else {
+             return false;
+          }
+        } else {
+          // Compare with 'EEE-dd'
+          final clsDateStr = cls['date']?.toString();
+          if (clsDateStr != null) {
+             final clsDate = DateTime.tryParse(clsDateStr);
+             if (clsDate != null) {
+                final formatted = DateFormat('EEE-dd').format(clsDate);
+                if (formatted != _selectedDay) {
+                   return false;
+                }
+             } else {
+               return false;
+             }
+          } else {
+             return false;
+          }
+        }
+      }
+      return true;
+    }).toList();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -229,9 +323,9 @@ class _ClassScheduleScreenState extends State<ClassScheduleScreen> {
                     fontWeight: FontWeight.w700,
                   ),
                 ),
-                const Text(
-                  '5 Results',
-                  style: TextStyle(
+                Text(
+                  '${_isLoading ? '-' : _filteredClasses.length} Results',
+                  style: const TextStyle(
                     color: Color(0xFF6B7280),
                     fontSize: 14,
                     fontFamily: 'Lexend',
@@ -245,65 +339,70 @@ class _ClassScheduleScreenState extends State<ClassScheduleScreen> {
           
           // Class List
           Expanded(
-            child: ListView(
-              padding: const EdgeInsets.only(left: 20, right: 20, bottom: 32),
-              children: const [
-                _ClassCard(
-                  title: 'Vinyasa Flow Power Hour',
-                  studio: 'Zen Studio',
-                  instructor: 'Sarah Jenkins',
-                  time: '08:00 AM – 08:50 AM',
-                  credits: 2,
-                  category: 'Yoga',
-                  spotsLeft: 4,
-                  imagePath: 'assets/Vinyasa Flow Power Hour.png',
-                ),
-                SizedBox(height: 16),
-                _ClassCard(
-                  title: 'Core Reformer Essentials',
-                  studio: 'Core Space',
-                  instructor: 'Marcus Lin',
-                  time: '09:30 AM – 10:20 AM',
-                  credits: 3,
-                  category: 'Pilates',
-                  isWaitlist: true,
-                  imagePath: 'assets/Core Reformer Essentials.png',
-                ),
-                SizedBox(height: 16),
-                _ClassCard(
-                  title: 'Full Body HIIT Burn',
-                  studio: 'Iron & Sweat',
-                  instructor: 'Coach T',
-                  time: '12:15 PM – 01:00 PM',
-                  credits: 3,
-                  category: 'HIIT',
-                  isWaitlist: true,
-                  imagePath: 'assets/Full Body HIIT Burn.png',
-                ),
-                SizedBox(height: 16),
-                _ClassCard(
-                  title: 'Vinyasa Flow Power Hour',
-                  studio: 'Zen Studio',
-                  instructor: 'Sarah Jenkins',
-                  time: '08:00 AM – 08:50 AM',
-                  credits: 2,
-                  category: 'Yoga',
-                  spotsLeft: 4,
-                  imagePath: 'assets/Vinyasa Flow Power Hour.png',
-                ),
-                SizedBox(height: 16),
-                _ClassCard(
-                  title: 'Core Reformer Essentials',
-                  studio: 'Core Space',
-                  instructor: 'Marcus Lin',
-                  time: '09:30 AM – 10:20 AM',
-                  credits: 3,
-                  category: 'Pilates',
-                  isWaitlist: true,
-                  imagePath: 'assets/Core Reformer Essentials.png',
-                ),
-              ],
-            ),
+            child: _isLoading
+                ? const Center(
+                    child: CircularProgressIndicator(color: Color(0xFF2D6A4F)))
+                : _error != null
+                    ? Center(child: Text('Error: $_error'))
+                    : _filteredClasses.isEmpty
+                        ? const Center(
+                            child: Text(
+                              'No classes found for this selection.',
+                              style: TextStyle(color: Color(0xFF6B7280)),
+                            ),
+                          )
+                        : ListView.builder(
+                            padding: const EdgeInsets.only(
+                                left: 20, right: 20, bottom: 32),
+                            itemCount: _filteredClasses.length,
+                            itemBuilder: (context, index) {
+                              final cls = _filteredClasses[index];
+                              final spotsLeft = int.tryParse(
+                                      cls['capacity']?.toString() ?? '0') ??
+                                  0;
+                              final price = double.tryParse(
+                                      cls['price']?.toString() ?? '0') ??
+                                  0;
+                                  
+                              String time = cls['start_time']?.toString() ?? 'Time';
+                              if (time.length > 5) {
+                                // Try to format '15:00:00' to '03:00 PM'
+                                try {
+                                  final parsedTime = DateFormat('HH:mm:ss').parse(time);
+                                  time = DateFormat('hh:mm a').format(parsedTime);
+                                  
+                                  // Add duration if available
+                                  final duration = int.tryParse(cls['duration_minutes']?.toString() ?? '60') ?? 60;
+                                  final endTime = parsedTime.add(Duration(minutes: duration));
+                                  time = '$time – ${DateFormat('hh:mm a').format(endTime)}';
+                                } catch (_) {}
+                              }
+                              
+                              String imagePath = 'assets/Morning.png';
+                              if (cls['images'] != null &&
+                                  (cls['images'] as List).isNotEmpty) {
+                                imagePath = cls['images'][0]['image'] ?? imagePath;
+                              }
+
+                              return Padding(
+                                padding: const EdgeInsets.only(bottom: 16),
+                                child: _ClassCard(
+                                  title: cls['name']?.toString() ?? 'Class Name',
+                                  studio:
+                                      cls['studio_name']?.toString() ?? 'Studio',
+                                  instructor: cls['instructor_name']?.toString() ??
+                                      'Instructor',
+                                  time: time,
+                                  credits: price.toInt(),
+                                  category:
+                                      cls['category']?.toString() ?? 'Category',
+                                  spotsLeft: spotsLeft > 0 ? spotsLeft : null,
+                                  isWaitlist: spotsLeft == 0,
+                                  imagePath: imagePath,
+                                ),
+                              );
+                            },
+                          ),
           ),
         ],
       ),
@@ -378,12 +477,23 @@ class _ClassCard extends StatelessWidget {
                         height: 88,
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(16),
-                          image: DecorationImage(
-                            image: imagePath.startsWith('http')
-                                ? NetworkImage(imagePath) as ImageProvider
-                                : AssetImage(imagePath),
-                            fit: BoxFit.cover,
-                          ),
+                          color: const Color(0xFFF3F4F1),
+                        ),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(16),
+                          child: imagePath.startsWith('http')
+                              ? Image.network(
+                                  imagePath,
+                                  fit: BoxFit.cover,
+                                  errorBuilder: (context, error, stackTrace) => Image.asset(
+                                    'assets/Morning.png',
+                                    fit: BoxFit.cover,
+                                  ),
+                                )
+                              : Image.asset(
+                                  imagePath,
+                                  fit: BoxFit.cover,
+                                ),
                         ),
                       ),
                       const SizedBox(width: 16),

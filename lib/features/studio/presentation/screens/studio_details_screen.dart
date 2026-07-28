@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:video_player/video_player.dart';
+import '../../services/studio_service.dart';
+import 'video_player_screen.dart';
 
 class StudioDetailsScreen extends StatefulWidget {
-  const StudioDetailsScreen({super.key});
+  final int? studioId;
+  const StudioDetailsScreen({super.key, this.studioId});
 
   @override
   State<StudioDetailsScreen> createState() => _StudioDetailsScreenState();
@@ -10,15 +14,51 @@ class StudioDetailsScreen extends StatefulWidget {
 class _StudioDetailsScreenState extends State<StudioDetailsScreen> {
   bool _isFavorite = false;
   String _selectedDay = 'TODAY';
+  Map<String, dynamic>? _studio;
+  bool _isLoading = true;
+  String? _error;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchStudioDetails();
+  }
+
+  Future<void> _fetchStudioDetails() async {
+    try {
+      final id = widget.studioId ?? 1; // Fallback to 1 if not provided
+      final data = await StudioService.getStudioDetails(id);
+      if (mounted) {
+        setState(() {
+          _studio = data;
+          _isLoading = false;
+          _isFavorite = data['is_favorite'] ?? false;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _error = e.toString();
+          _isLoading = false;
+        });
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
-        child: Stack(
-          children: [
-            // Scrollable Content
+        child: _isLoading
+            ? const Center(child: CircularProgressIndicator())
+            : _error != null
+                ? Center(child: Text('Error: $_error'))
+                : _studio == null
+                    ? const Center(child: Text('Studio not found'))
+                    : Stack(
+                        children: [
+                          // Scrollable Content
             SingleChildScrollView(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -30,12 +70,35 @@ class _StudioDetailsScreenState extends State<StudioDetailsScreen> {
                       Container(
                         margin: const EdgeInsets.symmetric(horizontal: 26),
                         height: 320,
+                        width: double.infinity,
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(12),
-                          image: const DecorationImage(
-                            image: AssetImage('assets/ZenFlowStudio.png'),
-                            fit: BoxFit.cover,
-                          ),
+                          color: const Color(0xFFF3F4F1),
+                        ),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(12),
+                          child: _studio!['cover_photo'] != null
+                              ? Image.network(
+                                  _studio!['cover_photo'],
+                                  fit: BoxFit.cover,
+                                  errorBuilder: (context, error, stackTrace) => Image.asset(
+                                    'assets/ZenFlowStudio.png',
+                                    fit: BoxFit.cover,
+                                  ),
+                                )
+                              : (_studio!['images'] != null && (_studio!['images'] as List).isNotEmpty)
+                                  ? Image.network(
+                                      _studio!['images'][0]['image'],
+                                      fit: BoxFit.cover,
+                                      errorBuilder: (context, error, stackTrace) => Image.asset(
+                                        'assets/ZenFlowStudio.png',
+                                        fit: BoxFit.cover,
+                                      ),
+                                    )
+                                  : Image.asset(
+                                      'assets/ZenFlowStudio.png',
+                                      fit: BoxFit.cover,
+                                    ),
                         ),
                       ),
                       // Image Counter
@@ -51,9 +114,9 @@ class _StudioDetailsScreenState extends State<StudioDetailsScreen> {
                             color: const Color(0xCC2E312F),
                             borderRadius: BorderRadius.circular(9999),
                           ),
-                          child: const Text(
-                            '1 / 19',
-                            style: TextStyle(
+                          child: Text(
+                            '1 / ${(_studio!['images'] as List?)?.length ?? 1}',
+                            style: const TextStyle(
                               color: Color(0xFFEFF1ED),
                               fontSize: 12,
                               fontFamily: 'Lexend',
@@ -72,10 +135,10 @@ class _StudioDetailsScreenState extends State<StudioDetailsScreen> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        const Expanded(
+                        Expanded(
                           child: Text(
-                            'Zen Flow Studio',
-                            style: TextStyle(
+                            _studio!['name'] ?? 'Studio Name',
+                            style: const TextStyle(
                               color: Color(0xFF191C1A),
                               fontSize: 24,
                               fontFamily: 'Lexend',
@@ -131,19 +194,23 @@ class _StudioDetailsScreenState extends State<StudioDetailsScreen> {
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 26),
                     child: Row(
-                      children: const [
-                        Text(
-                          'Camden Court',
-                          style: TextStyle(
-                            color: Color(0xFF404943),
-                            fontSize: 14,
-                            fontFamily: 'Lexend',
-                            fontWeight: FontWeight.w400,
-                            height: 1.43,
+                      children: [
+                        Expanded(
+                          child: Text(
+                            _studio!['full_address'] ?? 'Unknown Location',
+                            style: const TextStyle(
+                              color: Color(0xFF404943),
+                              fontSize: 14,
+                              fontFamily: 'Lexend',
+                              fontWeight: FontWeight.w400,
+                              height: 1.43,
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 1,
                           ),
                         ),
-                        SizedBox(width: 8),
-                        Text(
+                        const SizedBox(width: 8),
+                        const Text(
                           '·',
                           style: TextStyle(
                             color: Color(0xFF707973),
@@ -153,10 +220,10 @@ class _StudioDetailsScreenState extends State<StudioDetailsScreen> {
                             height: 1.50,
                           ),
                         ),
-                        SizedBox(width: 8),
+                        const SizedBox(width: 8),
                         Text(
-                          '2.4 mi',
-                          style: TextStyle(
+                          '${_studio!['distance'] != null ? _studio!['distance'].toStringAsFixed(1) : '-'} mi',
+                          style: const TextStyle(
                             color: Color(0xFF404943),
                             fontSize: 14,
                             fontFamily: 'Lexend',
@@ -173,10 +240,9 @@ class _StudioDetailsScreenState extends State<StudioDetailsScreen> {
                     padding: const EdgeInsets.symmetric(horizontal: 26),
                     child: Wrap(
                       spacing: 8,
-                      children: const [
-                        _CategoryBadge(label: 'Pilates'),
-                        _CategoryBadge(label: 'Barre'),
-                        _CategoryBadge(label: 'Yoga'),
+                      children: [
+                        if (_studio!['primary_category'] != null)
+                          _CategoryBadge(label: _studio!['primary_category']),
                       ],
                     ),
                   ),
@@ -218,37 +284,52 @@ class _StudioDetailsScreenState extends State<StudioDetailsScreen> {
                   ),
                   const SizedBox(height: 24),
                   // Videos Section
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 26),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text(
-                          'Videos',
-                          style: TextStyle(
-                            color: Color(0xFF191C1A),
-                            fontSize: 16,
-                            fontFamily: 'Lexend',
-                            fontWeight: FontWeight.w600,
-                            height: 1.38,
+                  if (_studio!['videos'] != null && (_studio!['videos'] as List).isNotEmpty)
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 26),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                            'Videos',
+                            style: TextStyle(
+                              color: Color(0xFF191C1A),
+                              fontSize: 16,
+                              fontFamily: 'Lexend',
+                              fontWeight: FontWeight.w600,
+                              height: 1.38,
+                            ),
                           ),
-                        ),
-                        const SizedBox(height: 12),
-                        SingleChildScrollView(
-                          scrollDirection: Axis.horizontal,
-                          child: Row(
-                            children: [
-                              const _VideoThumbnail(imagePath: 'assets/video thambnail 1.png'),
-                              const SizedBox(width: 8),
-                              const _VideoThumbnail(imagePath: 'assets/video thambnail 2.png'),
-                              const SizedBox(width: 8),
-                              const _SeeAllVideos(),
-                            ],
+                          const SizedBox(height: 12),
+                          SingleChildScrollView(
+                            scrollDirection: Axis.horizontal,
+                            child: Row(
+                              children: [
+                                ...(_studio!['videos'] as List).map((video) {
+                                  return Padding(
+                                    padding: const EdgeInsets.only(right: 8.0),
+                                    child: _VideoThumbnail(
+                                      videoUrl: video['video'],
+                                      onTap: () {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) => VideoPlayerScreen(videoUrl: video['video']),
+                                          ),
+                                        );
+                                      },
+                                    ),
+                                  );
+                                }),
+                                const _SeeAllVideos(),
+                              ],
+                            ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
-                  ),
+                  if (_studio!['videos'] != null && (_studio!['videos'] as List).isNotEmpty)
+                    const SizedBox(height: 24),
                   const SizedBox(height: 24),
                   // Schedule Section
                   Padding(
@@ -312,39 +393,32 @@ class _StudioDetailsScreenState extends State<StudioDetailsScreen> {
                         ),
                         const SizedBox(height: 12),
                         // Class Cards
-                        _ClassTimeCard(
-                          time: '17:30',
-                          duration: '50 min',
-                          className: 'Dynamic Reformer',
-                          instructor: 'with Sarah Jenkins',
-                          spots: '11 spots',
-                          spotsColor: const Color(0xFFD9E6DA),
-                          spotsTextColor: const Color(0xFF5B675E),
-                        ),
-                        const SizedBox(height: 2),
-                        _ClassTimeCard(
-                          time: '18:30',
-                          duration: '45 min',
-                          className: 'Vinyasa Flow',
-                          instructor: 'with Michael T.',
-                          spots: '2 spots',
-                          spotsColor: const Color(0xFFFFDAD6),
-                          spotsTextColor: const Color(0xFF93000A),
-                        ),
-                        const SizedBox(height: 2),
-                        Opacity(
-                          opacity: 0.75,
-                          child: _ClassTimeCard(
-                            time: '19:30',
-                            duration: '60 min',
-                            className: 'Restorative Yin',
-                            instructor: 'with Emma W.',
-                            spots: 'Waitlist',
-                            spotsColor: const Color(0xFFE1E3DF),
-                            spotsTextColor: const Color(0xFF404943),
-                            hasBorder: true,
+                        if (_studio!['classes'] != null && (_studio!['classes'] as List).isNotEmpty)
+                          ...(_studio!['classes'] as List).map((cls) {
+                            String startTimeStr = cls['start_time'] ?? '00:00:00';
+                            String time = startTimeStr.substring(0, 5); // Assuming format "HH:MM:SS"
+                            return Padding(
+                              padding: const EdgeInsets.only(bottom: 2.0),
+                              child: _ClassTimeCard(
+                                time: time,
+                                duration: '${cls['duration_minutes'] ?? 60} min',
+                                className: cls['name'] ?? 'Class Name',
+                                instructor: 'with ${cls['instructor_name'] ?? 'Instructor'}',
+                                spots: '${cls['capacity'] ?? 10} spots',
+                                spotsColor: const Color(0xFFD9E6DA),
+                                spotsTextColor: const Color(0xFF5B675E),
+                              ),
+                            );
+                          })
+                        else
+                          const Text(
+                            'No classes scheduled.',
+                            style: TextStyle(
+                              color: Color(0xFF707973),
+                              fontSize: 14,
+                              fontFamily: 'Lexend',
+                            ),
                           ),
-                        ),
                       ],
                     ),
                   ),
@@ -469,8 +543,8 @@ class _StudioDetailsScreenState extends State<StudioDetailsScreen> {
                     padding: const EdgeInsets.symmetric(horizontal: 26),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
-                      children: const [
-                        Text(
+                      children: [
+                        const Text(
                           'About',
                           style: TextStyle(
                             color: Color(0xFF191C1A),
@@ -480,10 +554,10 @@ class _StudioDetailsScreenState extends State<StudioDetailsScreen> {
                             height: 1.38,
                           ),
                         ),
-                        SizedBox(height: 12),
+                        const SizedBox(height: 12),
                         Text(
-                          'Zen Flow Studio offers a sanctuary in the heart of the city. We specialize in contemporary Pilates, dynamic Yoga flows, and restorative practices designed tostrengthen the body and calm the mind.',
-                          style: TextStyle(
+                          _studio!['description'] ?? 'No description available.',
+                          style: const TextStyle(
                             color: Color(0xFF404943),
                             fontSize: 12,
                             fontFamily: 'Lexend',
@@ -613,44 +687,94 @@ class _CategoryBadge extends StatelessWidget {
   }
 }
 
-class _VideoThumbnail extends StatelessWidget {
-  final String imagePath;
+class _VideoThumbnail extends StatefulWidget {
+  final String videoUrl;
+  final VoidCallback? onTap;
 
-  const _VideoThumbnail({required this.imagePath});
+  const _VideoThumbnail({required this.videoUrl, this.onTap});
+
+  @override
+  State<_VideoThumbnail> createState() => _VideoThumbnailState();
+}
+
+class _VideoThumbnailState extends State<_VideoThumbnail> {
+  late VideoPlayerController _controller;
+  bool _initialized = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = VideoPlayerController.networkUrl(Uri.parse(widget.videoUrl))
+      ..initialize().then((_) {
+        if (mounted) {
+          setState(() {
+            _initialized = true;
+          });
+        }
+      }).catchError((e) {
+        print('Error initializing video thumbnail: $e');
+      });
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: 171,
-      height: 100,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(12),
-        image: DecorationImage(
-          image: imagePath.startsWith('http')
-              ? NetworkImage(imagePath) as ImageProvider
-              : AssetImage(imagePath),
-          fit: BoxFit.cover,
-        ),
-      ),
+    return GestureDetector(
+      onTap: widget.onTap,
       child: Container(
+        width: 171,
+        height: 100,
         decoration: BoxDecoration(
-          color: Colors.black.withValues(alpha: 0.20),
           borderRadius: BorderRadius.circular(12),
+          color: const Color(0xFFF3F4F1),
         ),
-        child: Center(
-          child: Container(
-            width: 32,
-            height: 32,
-            decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.90),
-              borderRadius: BorderRadius.circular(9999),
+        clipBehavior: Clip.antiAlias,
+        child: Stack(
+          fit: StackFit.expand,
+          children: [
+            if (_initialized)
+              FittedBox(
+                fit: BoxFit.cover,
+                child: SizedBox(
+                  width: _controller.value.size.width,
+                  height: _controller.value.size.height,
+                  child: VideoPlayer(_controller),
+                ),
+              )
+            else
+              const Center(
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  color: Color(0xFF0F5238),
+                ),
+              ),
+            Container(
+              decoration: BoxDecoration(
+                color: Colors.black.withValues(alpha: 0.20),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Center(
+                child: Container(
+                  width: 32,
+                  height: 32,
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.90),
+                    borderRadius: BorderRadius.circular(9999),
+                  ),
+                  child: const Icon(
+                    Icons.play_arrow,
+                    color: Color(0xFF0F5238),
+                    size: 20,
+                  ),
+                ),
+              ),
             ),
-            child: const Icon(
-              Icons.play_arrow,
-              color: Color(0xFF0F5238),
-              size: 20,
-            ),
-          ),
+          ],
         ),
       ),
     );

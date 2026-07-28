@@ -496,9 +496,13 @@ class _HomeScreenState extends State<HomeScreen> {
                         time: studio['full_address']?.toString() ?? 'Near you',
                         credits: '1-3 cr',
                         spotsLeft: 'Open',
-                        imagePath: 'assets/ZenFlowStudio.png', // Temporary hardcoded since cover_photo might be a full URL, but AssetImage needs local
+                        imagePath: studio['cover_photo'] != null 
+                            ? studio['cover_photo'].toString() 
+                            : (studio['images'] != null && (studio['images'] as List).isNotEmpty) 
+                                ? studio['images'][0]['image'].toString() 
+                                : 'assets/ZenFlowStudio.png',
                         onTap: () {
-                          Navigator.pushNamed(context, AppRoutes.studioDetails);
+                          Navigator.pushNamed(context, AppRoutes.studioDetails, arguments: studio['id']);
                         },
                       ),
                     );
@@ -606,19 +610,34 @@ class _StudioCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Container(
+            SizedBox(
               width: double.infinity,
               height: 110,
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-              decoration: BoxDecoration(
-                image: DecorationImage(
-                  image: imagePath.startsWith('http')
-                      ? NetworkImage(imagePath) as ImageProvider
-                      : AssetImage(imagePath),
-                  fit: BoxFit.cover,
-                ),
-              ),
-              child: Column(
+              child: Stack(
+                fit: StackFit.expand,
+                children: [
+                  ClipRRect(
+                    borderRadius: const BorderRadius.only(
+                      topLeft: Radius.circular(8),
+                      topRight: Radius.circular(8),
+                    ),
+                    child: imagePath.startsWith('http')
+                        ? Image.network(
+                            imagePath,
+                            fit: BoxFit.cover,
+                            errorBuilder: (context, error, stackTrace) => Image.asset(
+                              'assets/ZenFlowStudio.png',
+                              fit: BoxFit.cover,
+                            ),
+                          )
+                        : Image.asset(
+                            imagePath,
+                            fit: BoxFit.cover,
+                          ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                    child: Column(
                 mainAxisAlignment: MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
@@ -652,9 +671,12 @@ class _StudioCard extends StatelessWidget {
                       ],
                     ),
                   ),
-                ],
+                  ],
+                ),
               ),
-            ),
+            ],
+          ),
+        ),
             Padding(
               padding: const EdgeInsets.all(12),
               child: Column(
@@ -758,15 +780,25 @@ class _ClassListItem extends StatelessWidget {
             Container(
               width: 70,
               height: 70,
-              clipBehavior: Clip.antiAlias,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(8),
-                image: DecorationImage(
-                  image: imagePath.startsWith('http')
-                      ? NetworkImage(imagePath) as ImageProvider
-                      : AssetImage(imagePath),
-                  fit: BoxFit.cover,
-                ),
+                color: const Color(0xFFF3F4F1),
+              ),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(8),
+                child: imagePath.startsWith('http')
+                    ? Image.network(
+                        imagePath,
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) => Image.asset(
+                          'assets/ZenFlowStudio.png',
+                          fit: BoxFit.cover,
+                        ),
+                      )
+                    : Image.asset(
+                        imagePath,
+                        fit: BoxFit.cover,
+                      ),
               ),
             ),
             const SizedBox(width: 16),

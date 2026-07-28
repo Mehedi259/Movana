@@ -78,7 +78,8 @@ class AppRouter {
       
       // Details Routes
       case AppRoutes.studioDetails:
-        return MaterialPageRoute(builder: (_) => const StudioDetailsScreen());
+        final studioId = settings.arguments as int?;
+        return MaterialPageRoute(builder: (_) => StudioDetailsScreen(studioId: studioId));
       case AppRoutes.classDetails:
         return MaterialPageRoute(builder: (_) => const ClassDetailsScreen());
       case AppRoutes.reservation:
