@@ -88,11 +88,20 @@ class _ReservationScreenState extends State<ReservationScreen> {
     }
 
     final classData = _classDetails ?? {};
-    final studioData = classData['studio'] ?? {};
     final creditData = _creditStatus ?? {};
-
     final className = classData['name'] ?? 'Class Name';
-    final studioName = studioData['name'] ?? 'Studio Name';
+    
+    // Sometimes 'studio' might be an int ID, and 'studio_name' or 'location' has the string
+    String studioName = 'Studio Name';
+    if (classData['studio'] is Map) {
+      studioName = classData['studio']['name'] ?? 'Studio Name';
+    } else if (classData['studio_name'] != null) {
+      studioName = classData['studio_name'].toString();
+    } else if (classData['location'] != null) {
+      studioName = classData['location'].toString();
+    }
+    
+    final instructorName = classData['instructor_name'] ?? 'Instructor';
     final dateStr = classData['date'] ?? 'Date';
     final startTimeStr = classData['start_time'] ?? '00:00:00';
     final endTimeStr = classData['end_time'] ?? '00:00:00';

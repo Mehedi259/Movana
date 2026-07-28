@@ -1,9 +1,42 @@
 import 'package:flutter/material.dart';
 import '../../../../core/constants/app_colors.dart';
-import '../../../../shared/widgets/custom_button.dart';
+import '../../../../core/constants/app_colors.dart';
+import '../../services/profile_service.dart';
 
 class PlansScreen extends StatelessWidget {
   const PlansScreen({super.key});
+
+  Future<void> _subscribeToPlan(BuildContext context, int planId) async {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => const Center(child: CircularProgressIndicator()),
+    );
+
+    try {
+      await ProfileService.subscribeToPlan(planId);
+      if (context.mounted) {
+        Navigator.pop(context); // Dismiss loading
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Plan subscribed successfully!'),
+            backgroundColor: Colors.green,
+          ),
+        );
+        Navigator.pop(context); // Go back to profile screen
+      }
+    } catch (e) {
+      if (context.mounted) {
+        Navigator.pop(context); // Dismiss loading
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(e.toString().replaceAll('Exception: ', '')),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -140,7 +173,7 @@ class PlansScreen extends StatelessWidget {
               ],
               buttonText: 'Select Plan',
               isRecommended: false,
-              onTap: () {},
+              onTap: () => _subscribeToPlan(context, 1),
             ),
             const SizedBox(height: 16),
             // Pro Plan (Current)
@@ -154,10 +187,10 @@ class PlansScreen extends StatelessWidget {
                 'Access to premium studios',
                 'Roll over up to 20 unused credits',
               ],
-              buttonText: 'Current Plan',
+              buttonText: 'Select Plan',
               isRecommended: true,
-              isCurrent: true,
-              onTap: () {},
+              isCurrent: false,
+              onTap: () => _subscribeToPlan(context, 2),
             ),
             const SizedBox(height: 16),
             // Elite Plan
@@ -172,7 +205,7 @@ class PlansScreen extends StatelessWidget {
               ],
               buttonText: 'Select Plan',
               isRecommended: false,
-              onTap: () {},
+              onTap: () => _subscribeToPlan(context, 3),
             ),
             const SizedBox(height: 32),
             // Buy Extra Credits

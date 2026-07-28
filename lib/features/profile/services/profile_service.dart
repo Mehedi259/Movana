@@ -110,6 +110,24 @@ class ProfileService {
     }
   }
 
+  // Subscribe to Plan
+  static Future<Map<String, dynamic>> subscribeToPlan(int planId) async {
+    try {
+      final response = await http.post(
+        Uri.parse(ApiConstants.subscribe),
+        headers: await _getHeaders(),
+        body: json.encode({
+          'plan_id': planId,
+          'payment_reference': 'dummy_payment_ref_${DateTime.now().millisecondsSinceEpoch}',
+        }),
+      );
+      return _processResponse(response);
+    } catch (e) {
+      _handleException(e);
+      rethrow;
+    }
+  }
+
   static Future<Map<String, dynamic>> deleteAccount() async {
     try {
       final response = await http.delete(

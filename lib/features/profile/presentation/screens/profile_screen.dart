@@ -12,6 +12,7 @@ class ProfileScreen extends StatefulWidget {
 
 class _ProfileScreenState extends State<ProfileScreen> {
   Map<String, dynamic>? _profileData;
+  Map<String, dynamic>? _creditData;
   bool _isLoading = true;
 
   @override
@@ -22,10 +23,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   Future<void> _fetchProfile() async {
     try {
-      final data = await ProfileService.getProfile();
+      final profileFuture = ProfileService.getProfile();
+      final creditFuture = ProfileService.getCreditStatus();
+      
+      final results = await Future.wait([profileFuture, creditFuture]);
+      
       if (mounted) {
         setState(() {
-          _profileData = data;
+          _profileData = results[0];
+          _creditData = results[1];
           _isLoading = false;
         });
       }
@@ -156,7 +162,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   children: [
                     Expanded(
                       child: _StatCard(
-                        value: '24',
+                        value: '0', // TODO: Add API for attended classes
                         label: 'Classes',
                         icon: Icons.fitness_center,
                       ),
@@ -164,7 +170,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     const SizedBox(width: 12),
                     Expanded(
                       child: _StatCard(
-                        value: '120',
+                        value: _creditData?['total_available']?.toString() ?? '0',
                         label: 'Credits',
                         icon: Icons.bolt,
                       ),
@@ -172,7 +178,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     const SizedBox(width: 12),
                     Expanded(
                       child: _StatCard(
-                        value: '4.9',
+                        value: '0.0', // TODO: Add API for average rating
                         label: 'Avg Rating',
                         icon: Icons.star,
                       ),
@@ -181,75 +187,89 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ),
               ),
               const SizedBox(height: 24),
-              // PRO Plan Card
-              Container(
-                margin: const EdgeInsets.symmetric(horizontal: 20),
-                padding: const EdgeInsets.all(20),
-                decoration: BoxDecoration(
-                  gradient: const LinearGradient(
-                    colors: [Color(0xFF10B981), Color(0xFF059669)],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
+                // Subscription Plan Card
+              Builder(builder: (context) {
+                final plan = _creditData?['plan'];
+                final planName = plan != null ? plan['name'] : 'No Active Plan';
+                final planCredits = _creditData?['plan_credits'] ?? 0;
+                final isPro = planName.toString().toLowerCase().contains('pro');
+                
+                return Container(
+                  margin: const EdgeInsets.symmetric(horizontal: 20),
+                  padding: const EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: isPro 
+                          ? [const Color(0xFF10B981), const Color(0xFF059669)]
+                          : [const Color(0xFF6B7280), const Color(0xFF4B5563)],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+                    borderRadius: BorderRadius.circular(16),
                   ),
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 12,
-                            vertical: 6,
-                          ),
-                          decoration: BoxDecoration(
-                            color: Colors.white.withValues(alpha: 0.2),
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          child: const Text(
-                            'PRO',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 12,
-                              fontWeight: FontWeight.bold,
-                              fontFamily: 'Lexend',
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          if (isPro)
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 12,
+                                vertical: 6,
+                              ),
+                              decoration: BoxDecoration(
+                                color: Colors.white.withValues(alpha: 0.2),
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                              child: const Text(
+                                'PRO',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.bold,
+                                  fontFamily: 'Lexend',
+                                ),
+                              ),
                             ),
+                          const Spacer(),
+                          const Icon(
+                            Icons.workspace_premium,
+                            color: Colors.white,
+                            size: 24,
                           ),
-                        ),
-                        const Spacer(),
-                        const Icon(
-                          Icons.workspace_premium,
+                        ],
+                      ),
+                      const SizedBox(height: 16),
+                      Text(
+                        planName,
+                        style: const TextStyle(
                           color: Colors.white,
-                          size: 24,
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          fontFamily: 'Lexend',
                         ),
-                      ],
-                    ),
-                    const SizedBox(height: 16),
-                    const Text(
-                      'PRO Plan',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                        fontFamily: 'Lexend',
                       ),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      '80 credits/month • Renews Dec 1',
-                      style: TextStyle(
-                        color: Colors.white.withValues(alpha: 0.9),
-                        fontSize: 14,
-                        fontFamily: 'Inter',
+                      const SizedBox(height: 8),
+                      Text(
+                        plan != null 
+                            ? '$planCredits credits/month' 
+                            : 'Upgrade to book classes',
+                        style: TextStyle(
+                          color: Colors.white.withValues(alpha: 0.9),
+                          fontSize: 14,
+                          fontFamily: 'Inter',
+                        ),
                       ),
-                    ),
                     const SizedBox(height: 16),
                     SizedBox(
                       width: double.infinity,
                       child: ElevatedButton(
-                        onPressed: () {
-                          Navigator.pushNamed(context, AppRoutes.plans);
+                        onPressed: () async {
+                          await Navigator.pushNamed(context, AppRoutes.plans);
+                          if (context.mounted) {
+                            _fetchProfile();
+                          }
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.white,
@@ -272,8 +292,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     ),
                   ],
                 ),
-              ),
-              const SizedBox(height: 32),
+              );
+            }),
+            const SizedBox(height: 32),
               // Account Section
               const _SectionHeader(title: 'ACCOUNT'),
               Container(
