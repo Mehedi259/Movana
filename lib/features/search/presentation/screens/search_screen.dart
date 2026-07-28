@@ -395,9 +395,15 @@ class _SearchResultCard extends StatelessWidget {
                 color: const Color(0xFFECEEEA),
                 borderRadius: BorderRadius.circular(8),
                 image: DecorationImage(
-                  image: imagePath.startsWith('http')
-                      ? NetworkImage(imagePath) as ImageProvider
-                      : AssetImage(imagePath),
+                  image: (networkImage != null && networkImage!.isNotEmpty)
+                      ? NetworkImage(
+                          networkImage!.startsWith('http')
+                              ? networkImage!
+                              : 'http://16.170.40.206:8000$networkImage'
+                        ) as ImageProvider
+                      : (imagePath.startsWith('http')
+                          ? NetworkImage(imagePath) as ImageProvider
+                          : AssetImage(imagePath)),
                   fit: BoxFit.cover,
                 ),
               ),

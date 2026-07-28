@@ -185,14 +185,20 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
       itemBuilder: (context, index) {
         if (index == _classes.length) return const SizedBox(height: 100);
         final cls = _classes[index];
-        final studio = cls['studio'] ?? {};
+        final studioName = (cls['studio'] is Map) 
+            ? (cls['studio']['name'] ?? 'Studio') 
+            : (cls['studio_name'] ?? 'Studio');
+        final location = (cls['studio'] is Map) 
+            ? (cls['studio']['location'] ?? 'Location') 
+            : (cls['location'] ?? 'Location');
+            
         return Padding(
           padding: const EdgeInsets.only(bottom: 12),
           child: _FavoriteStudioCard(
             name: cls['name'] ?? 'Class',
-            categories: [(studio['name'] ?? 'Studio').toString()],
+            categories: [studioName.toString()],
             distance: '',
-            location: studio['location'] ?? 'Location',
+            location: location.toString(),
             rating: 4.8,
             reviews: 80,
             imagePath: 'assets/FitForseGym.png',
@@ -311,9 +317,15 @@ class _FavoriteStudioCardState extends State<_FavoriteStudioCard> {
                 color: const Color(0xFFE1E3DF),
                 borderRadius: BorderRadius.circular(12),
                 image: DecorationImage(
-                  image: widget.imagePath.startsWith('http')
-                      ? NetworkImage(widget.imagePath) as ImageProvider
-                      : AssetImage(widget.imagePath),
+                  image: (widget.networkImage != null && widget.networkImage!.isNotEmpty)
+                      ? NetworkImage(
+                          widget.networkImage!.startsWith('http')
+                              ? widget.networkImage!
+                              : 'http://16.170.40.206:8000${widget.networkImage}'
+                        ) as ImageProvider
+                      : (widget.imagePath.startsWith('http')
+                          ? NetworkImage(widget.imagePath) as ImageProvider
+                          : AssetImage(widget.imagePath)),
                   fit: BoxFit.cover,
                 ),
               ),

@@ -3,6 +3,7 @@ import 'package:intl/intl.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_routes.dart';
 import '../../../studio/services/studio_service.dart';
+import '../../../favorites/services/favorites_service.dart';
 
 class ClassDetailsEnhancedScreen extends StatefulWidget {
   final int? classId;
@@ -44,6 +45,7 @@ class _ClassDetailsEnhancedScreenState extends State<ClassDetailsEnhancedScreen>
       final data = await StudioService.getClassDetails(widget.classId!);
       setState(() {
         _classData = data;
+        _isFavorite = data['is_favorite'] ?? false;
         _isLoading = false;
       });
     } catch (e) {
@@ -186,13 +188,8 @@ class _ClassDetailsEnhancedScreenState extends State<ClassDetailsEnhancedScreen>
             ),
             actions: [
               IconButton(
-                icon: Icon(
-                  _isFavorite ? Icons.favorite : Icons.favorite_border,
-                  color: _isFavorite ? Colors.red : Colors.white,
-                ),
-                onPressed: () {
-                  setState(() => _isFavorite = !_isFavorite);
-                },
+                icon: const Icon(Icons.share, color: Colors.black),
+                onPressed: () {},
               ),
             ],
           ),
@@ -218,6 +215,43 @@ class _ClassDetailsEnhancedScreenState extends State<ClassDetailsEnhancedScreen>
                               ),
                             ),
                           ),
+                          GestureDetector(
+                            onTap: () async {
+                              if (widget.classId == null) return;
+                              
+                              final previousState = _isFavorite;
+                              setState(() => _isFavorite = !_isFavorite);
+                              
+                              try {
+                                final newState = await FavoritesService.toggleFavoriteClass(widget.classId!);
+                                if (mounted) {
+                                  setState(() => _isFavorite = newState);
+                                }
+                              } catch (e) {
+                                if (mounted) {
+                                  setState(() => _isFavorite = previousState);
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(content: Text('Failed to update favorite status')),
+                                  );
+                                }
+                              }
+                            },
+                            child: Container(
+                              width: 36,
+                              height: 36,
+                              padding: const EdgeInsets.all(8),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFFF2F4F0),
+                                borderRadius: BorderRadius.circular(9999),
+                              ),
+                              child: Icon(
+                                _isFavorite ? Icons.favorite : Icons.favorite_border,
+                                size: 20,
+                                color: _isFavorite ? Colors.red : const Color(0xFF404943),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 12),
                           Container(
                             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                             decoration: BoxDecoration(
