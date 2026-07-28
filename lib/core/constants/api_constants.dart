@@ -21,6 +21,8 @@ class ApiConstants {
 
   // Bookings endpoints
   static const String bookClass = '$baseUrl/bookings/book/';
+  static const String bookingsStatus = '$baseUrl/bookings/status/';
+  static String cancelBooking(int id) => '$baseUrl/bookings/$id/cancel/';
   
   // Home/Studio Endpoints
   static const String classes = '$baseUrl/studios/classes/explore/';

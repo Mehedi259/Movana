@@ -26,6 +26,33 @@ class BookingService {
     }
   }
 
+  static Future<Map<String, dynamic>> getCategorizedBookings() async {
+    try {
+      final response = await http.get(
+        Uri.parse(ApiConstants.bookingsStatus),
+        headers: await _getHeaders(),
+      );
+      return _processResponse(response);
+    } catch (e) {
+      _handleException(e);
+      rethrow;
+    }
+  }
+
+  static Future<Map<String, dynamic>> cancelBooking(int bookingId) async {
+    try {
+      final response = await http.post(
+        Uri.parse(ApiConstants.cancelBooking(bookingId)),
+        headers: await _getHeaders(),
+      );
+      return _processResponse(response);
+    } catch (e) {
+      _handleException(e);
+      rethrow;
+    }
+  }
+
+
   static void _handleException(dynamic e) {
     print('API Error (Booking): $e');
     if (!e.toString().startsWith('Exception: ')) {

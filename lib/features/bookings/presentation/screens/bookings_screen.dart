@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../../shared/widgets/custom_bottom_nav_bar.dart';
+import '../../../reservation/services/booking_service.dart';
 
 class BookingsScreen extends StatefulWidget {
   const BookingsScreen({super.key});
@@ -10,6 +11,74 @@ class BookingsScreen extends StatefulWidget {
 
 class _BookingsScreenState extends State<BookingsScreen> {
   int _selectedTab = 0;
+  bool _isLoading = true;
+  List<dynamic> _upcoming = [];
+  List<dynamic> _past = [];
+  List<dynamic> _cancelled = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchBookings();
+  }
+
+  Future<void> _fetchBookings() async {
+    setState(() => _isLoading = true);
+    try {
+      final data = await BookingService.getCategorizedBookings();
+      if (mounted) {
+        setState(() {
+          _upcoming = data['upcoming'] ?? [];
+          _past = data['past'] ?? [];
+          _cancelled = data['cancelled'] ?? [];
+          _isLoading = false;
+        });
+      }
+    } catch (e) {
+      print('Error fetching bookings: $e');
+      if (mounted) setState(() => _isLoading = false);
+    }
+  }
+
+  Future<void> _cancelBooking(int id) async {
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Cancel Booking'),
+        content: const Text('Are you sure you want to cancel this booking?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: const Text('No'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            child: const Text('Yes', style: TextStyle(color: Colors.red)),
+          ),
+        ],
+      ),
+    );
+
+    if (confirm != true) return;
+
+    setState(() => _isLoading = true);
+    try {
+      await BookingService.cancelBooking(id);
+      await _fetchBookings();
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Booking cancelled successfully'), backgroundColor: Colors.green),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(e.toString().replaceAll('Exception: ', '')), backgroundColor: Colors.red),
+        );
+        setState(() => _isLoading = false);
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -26,7 +95,7 @@ class _BookingsScreenState extends State<BookingsScreen> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: const [
                   Text(
-                    'Booking Setails',
+                    'Booking Details',
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       color: Color(0xFF0B191D),
@@ -76,11 +145,17 @@ class _BookingsScreenState extends State<BookingsScreen> {
             
             // Content
             Expanded(
-              child: _selectedTab == 0
-                  ? _buildUpcomingTab()
-                  : _selectedTab == 1
-                      ? _buildPastTab()
-                      : _buildCancelledTab(),
+              child: _isLoading 
+                ? const Center(child: CircularProgressIndicator(color: Color(0xFF0F5238)))
+                : RefreshIndicator(
+                    onRefresh: _fetchBookings,
+                    color: const Color(0xFF0F5238),
+                    child: _selectedTab == 0
+                      ? _buildTabList(_upcoming, showCancel: true)
+                      : _selectedTab == 1
+                          ? _buildTabList(_past, showCancel: false)
+                          : _buildTabList(_cancelled, showCancel: false),
+                  ),
             ),
           ],
         ),
@@ -89,82 +164,44 @@ class _BookingsScreenState extends State<BookingsScreen> {
     );
   }
 
-  Widget _buildUpcomingTab() {
-    return ListView(
-      padding: const EdgeInsets.symmetric(horizontal: 26),
-      children: const [
-        _BookingCard(
-          className: 'Reformer Pilates',
-          studioName: 'Zen Flow Studio',
-          date: 'Mon, Mar 16',
-          time: '7:00 AM to 7:30 AM',
-          instructor: 'Giovanna',
-          location: 'Unit 24, Point Square Shopping, East wall\nRoad, Dublin 1, Ireland',
-          credits: '20 credits',
-          status: 'Confirmed',
-        ),
-        SizedBox(height: 16),
-        _BookingCard(
-          className: 'Morning Vinyasa',
-          studioName: 'Zen Flow Studio',
-          date: 'Tue, Mar 17',
-          time: '8:30 AM to 9:30 AM',
-          instructor: 'Alex',
-          location: 'Unit 24, Point Square Shopping, East wall\nRoad, Dublin 1, Ireland',
-          credits: '5 credits',
-          status: 'Confirmed',
-        ),
-        SizedBox(height: 100),
-      ],
-    );
-  }
-
-  Widget _buildPastTab() {
-    return ListView(
-      padding: const EdgeInsets.symmetric(horizontal: 26),
-      children: const [
-        _BookingCard(
-          className: 'Power Yoga',
-          studioName: 'Zen Flow Studio',
-          date: 'Mon, Mar 9',
-          time: '6:00 AM to 7:00 AM',
-          instructor: 'Sarah',
-          location: 'Unit 24, Point Square Shopping, East wall\nRoad, Dublin 1, Ireland',
-          credits: '8 credits',
-          status: 'Completed',
-        ),
-        SizedBox(height: 16),
-        _BookingCard(
-          className: 'HIIT Training',
-          studioName: 'FitForce Gym',
-          date: 'Fri, Mar 6',
-          time: '5:30 PM to 6:30 PM',
-          instructor: 'Mike',
-          location: 'Unit 24, Point Square Shopping, East wall\nRoad, Dublin 1, Ireland',
-          credits: '10 credits',
-          status: 'Completed',
-        ),
-        SizedBox(height: 100),
-      ],
-    );
-  }
-
-  Widget _buildCancelledTab() {
-    return ListView(
-      padding: const EdgeInsets.symmetric(horizontal: 26),
-      children: const [
-        _BookingCard(
-          className: 'Spin Class',
-          studioName: 'CycleFit Studio',
-          date: 'Wed, Mar 11',
-          time: '7:00 PM to 8:00 PM',
-          instructor: 'Emma',
-          location: 'Unit 24, Point Square Shopping, East wall\nRoad, Dublin 1, Ireland',
-          credits: '12 credits',
-          status: 'Cancelled',
-        ),
-        SizedBox(height: 100),
-      ],
+  Widget _buildTabList(List<dynamic> list, {bool showCancel = false}) {
+    if (list.isEmpty) {
+      return ListView(
+        physics: const AlwaysScrollableScrollPhysics(),
+        children: const [
+          SizedBox(height: 100),
+          Center(child: Text('No bookings found')),
+        ],
+      );
+    }
+    return ListView.separated(
+      padding: const EdgeInsets.symmetric(horizontal: 26, vertical: 16),
+      itemCount: list.length + 1,
+      separatorBuilder: (_, __) => const SizedBox(height: 16),
+      itemBuilder: (context, index) {
+        if (index == list.length) return const SizedBox(height: 100);
+        final item = list[index];
+        final studioClass = item['studio_class'] ?? {};
+        final studio = studioClass['studio'] ?? {};
+        
+        return _BookingCard(
+          id: item['id'] ?? 0,
+          className: studioClass['name'] ?? 'Class Name',
+          studioName: studio['name'] ?? 'Studio Name',
+          date: studioClass['date'] ?? 'Date',
+          time: studioClass['start_time'] != null 
+              ? '${studioClass['start_time']} - ${studioClass['end_time'] ?? ''}' 
+              : 'Time',
+          instructor: studioClass['instructor_name'] ?? 'Instructor',
+          location: studio['location'] ?? 'Location',
+          credits: '${studioClass['credit_cost'] ?? 0} credits',
+          status: item['computed_status'] == 'completed' 
+              ? 'Completed' 
+              : item['computed_status'] == 'cancelled' ? 'Cancelled' : 'Confirmed',
+          showCancel: showCancel,
+          onCancel: () => _cancelBooking(item['id']),
+        );
+      },
     );
   }
 }
@@ -213,6 +250,7 @@ class _TabItem extends StatelessWidget {
 }
 
 class _BookingCard extends StatelessWidget {
+  final int id;
   final String className;
   final String studioName;
   final String date;
@@ -221,8 +259,11 @@ class _BookingCard extends StatelessWidget {
   final String location;
   final String credits;
   final String status;
+  final bool showCancel;
+  final VoidCallback? onCancel;
 
   const _BookingCard({
+    required this.id,
     required this.className,
     required this.studioName,
     required this.date,
@@ -231,6 +272,8 @@ class _BookingCard extends StatelessWidget {
     required this.location,
     required this.credits,
     required this.status,
+    this.showCancel = false,
+    this.onCancel,
   });
 
   @override
@@ -504,23 +547,21 @@ class _BookingCard extends StatelessWidget {
                     ],
                   ),
                 ),
-                GestureDetector(
-                  onTap: () {
-                    // Show cancel confirmation dialog
-                    print('Cancel booking: $className');
-                  },
-                  child: const Text(
-                    'Cancel',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      color: Color(0xFFBA1A1A),
-                      fontSize: 14,
-                      fontFamily: 'Lexend',
-                      fontWeight: FontWeight.w400,
-                      height: 1.50,
+                if (showCancel)
+                  GestureDetector(
+                    onTap: onCancel,
+                    child: const Text(
+                      'Cancel',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        color: Color(0xFFBA1A1A),
+                        fontSize: 14,
+                        fontFamily: 'Lexend',
+                        fontWeight: FontWeight.w400,
+                        height: 1.50,
+                      ),
                     ),
                   ),
-                ),
               ],
             ),
           ),

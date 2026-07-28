@@ -265,20 +265,20 @@ class _BookingConfirmationScreenState extends State<BookingConfirmationScreen> {
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
-                          children: const [
+                          children: [
                             Text(
-                              'Elevate Studio - Westside',
-                              style: TextStyle(
+                              studioName,
+                              style: const TextStyle(
                                 color: Color(0xFF191C1A),
                                 fontSize: 14,
                                 fontFamily: 'Lexend',
                                 fontWeight: FontWeight.w600,
                               ),
                             ),
-                            SizedBox(height: 4),
+                            const SizedBox(height: 4),
                             Text(
-                              '123 Wellness Way\nLos Angeles, CA 90025',
-                              style: TextStyle(
+                              studio['location'] ?? 'Location not available',
+                              style: const TextStyle(
                                 color: Color(0xFF404943),
                                 fontSize: 13,
                                 fontFamily: 'Lexend',

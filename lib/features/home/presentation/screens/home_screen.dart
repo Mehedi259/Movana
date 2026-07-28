@@ -17,6 +17,7 @@ class _HomeScreenState extends State<HomeScreen> {
   bool _isLoading = true;
   String _userName = 'User';
   String _credits = '0';
+  String _location = 'Location not set';
   List<dynamic> _classes = [];
   List<dynamic> _studios = [];
 
@@ -43,7 +44,8 @@ class _HomeScreenState extends State<HomeScreen> {
           _studios = results[3] as List<dynamic>;
 
           _userName = profile['name']?.toString() ?? 'User';
-          _credits = creditsData['remaining_credits']?.toString() ?? creditsData['credits']?.toString() ?? '0';
+          _location = profile['location']?.toString() ?? 'Location not set';
+          _credits = creditsData['total_available']?.toString() ?? '0';
           _isLoading = false;
         });
       }
@@ -89,31 +91,28 @@ class _HomeScreenState extends State<HomeScreen> {
                                 color: AppColors.textSecondary,
                               ),
                               const SizedBox(width: 4),
-                              Flexible(
-                                child: Text(
-                                  'San Francisco, CA',
-                                  style: TextStyle(
-                                    color: AppColors.textSecondary,
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w500,
-                                    height: 1.33,
-                                  ),
-                                  overflow: TextOverflow.ellipsis,
+                              Expanded(
+                              child: Text(
+                                _location,
+                                style: const TextStyle(
+                                  color: Color(0xFF6B7280),
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w500,
                                 ),
                               ),
+                            ),
                             ],
                           ),
-                          const SizedBox(height: 4),
-                          Text(
-                            'Good Evening, $_userName',
-                            style: TextStyle(
-                              color: AppColors.textPrimary,
-                              fontSize: 18,
-                              fontWeight: FontWeight.w700,
-                              height: 1.33,
-                            ),
-                            overflow: TextOverflow.ellipsis,
+                          const SizedBox(height: 8),
+                        Text(
+                          'Good Evening, $_userName',
+                          style: const TextStyle(
+                            color: AppColors.textDark,
+                            fontSize: 20,
+                            fontWeight: FontWeight.w700,
+                            letterSpacing: -0.20,
                           ),
+                        ),
                         ],
                       ),
                     ),
@@ -180,23 +179,31 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                       ),
                       const SizedBox(width: 8),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 8,
-                          vertical: 5,
-                        ),
-                        decoration: BoxDecoration(
-                          gradient: AppColors.primaryGradient,
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Text(
-                          '+ Add',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 12,
-                            fontWeight: FontWeight.w600,
-                            height: 1.33,
+                      GestureDetector(
+                        onTap: () async {
+                          await Navigator.pushNamed(context, AppRoutes.plans);
+                          if (mounted) {
+                            _fetchData();
+                          }
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 5,
+                          ),
+                          decoration: BoxDecoration(
+                            gradient: AppColors.primaryGradient,
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Text(
+                            '+ Add',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600,
+                              height: 1.33,
+                            ),
                           ),
                         ),
                       ),
