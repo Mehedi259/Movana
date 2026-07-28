@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../../core/constants/app_routes.dart';
 import '../../../../shared/widgets/custom_bottom_nav_bar.dart';
+import '../../services/favorites_service.dart';
 
 class FavoritesScreen extends StatefulWidget {
   const FavoritesScreen({super.key});
@@ -11,6 +12,52 @@ class FavoritesScreen extends StatefulWidget {
 
 class _FavoritesScreenState extends State<FavoritesScreen> {
   int _selectedTab = 0;
+  bool _isLoading = true;
+  List<dynamic> _studios = [];
+  List<dynamic> _classes = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchFavorites();
+  }
+
+  Future<void> _fetchFavorites() async {
+    setState(() => _isLoading = true);
+    try {
+      final studiosFuture = FavoritesService.getFavoriteStudios().catchError((_) => <dynamic>[]);
+      final classesFuture = FavoritesService.getFavoriteClasses().catchError((_) => <dynamic>[]);
+      final results = await Future.wait([studiosFuture, classesFuture]);
+      
+      if (mounted) {
+        setState(() {
+          _studios = results[0];
+          _classes = results[1];
+          _isLoading = false;
+        });
+      }
+    } catch (e) {
+      if (mounted) setState(() => _isLoading = false);
+    }
+  }
+
+  Future<void> _toggleFavoriteStudio(int id) async {
+    try {
+      await FavoritesService.toggleFavoriteStudio(id);
+      _fetchFavorites();
+    } catch (e) {
+      // ignore
+    }
+  }
+
+  Future<void> _toggleFavoriteClass(int id) async {
+    try {
+      await FavoritesService.toggleFavoriteClass(id);
+      _fetchFavorites();
+    } catch (e) {
+      // ignore
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -70,9 +117,15 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
             
             // Content
             Expanded(
-              child: _selectedTab == 0
-                  ? _buildStudiosTab()
-                  : _buildClassesTab(),
+              child: _isLoading 
+                ? const Center(child: CircularProgressIndicator(color: Color(0xFF2D6A4F)))
+                : RefreshIndicator(
+                    onRefresh: _fetchFavorites,
+                    color: const Color(0xFF2D6A4F),
+                    child: _selectedTab == 0
+                        ? _buildStudiosTab()
+                        : _buildClassesTab(),
+                  ),
             ),
           ],
         ),
@@ -82,88 +135,73 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
   }
 
   Widget _buildStudiosTab() {
-    return ListView(
-      padding: const EdgeInsets.symmetric(horizontal: 26),
-      children: const [
-        _FavoriteStudioCard(
-          name: 'Zen Flow Studio',
-          categories: ['Yoga', 'Pilates'],
-          distance: '1.2 km away',
-          location: 'Downtown',
-          rating: 4.9,
-          reviews: 128,
-          imagePath: 'assets/ZenFlowStudio.png',
-        ),
-        SizedBox(height: 12),
-        _FavoriteStudioCard(
-          name: 'FitForce Gym',
-          categories: ['HITT', 'Strength'],
-          distance: '3.5 km away',
-          location: 'Westside',
-          rating: 4.9,
-          reviews: 84,
-          imagePath: 'assets/FitForseGym.png',
-        ),
-        SizedBox(height: 12),
-        _FavoriteStudioCard(
-          name: 'Zen Flow Studio',
-          categories: ['Yoga', 'Pilates'],
-          distance: '1.2 km away',
-          location: 'Downtown',
-          rating: 4.9,
-          reviews: 128,
-          imagePath: 'assets/ZenFlowStudio.png',
-        ),
-        SizedBox(height: 12),
-        _FavoriteStudioCard(
-          name: 'FitForce Gym',
-          categories: ['HITT', 'Strength'],
-          distance: '3.5 km away',
-          location: 'Westside',
-          rating: 4.9,
-          reviews: 84,
-          imagePath: 'assets/FitForseGym.png',
-        ),
-        SizedBox(height: 100),
-      ],
+    if (_studios.isEmpty) {
+      return ListView(
+        physics: const AlwaysScrollableScrollPhysics(),
+        children: const [
+          SizedBox(height: 100),
+          Center(child: Text('No favorite studios found')),
+        ],
+      );
+    }
+    return ListView.builder(
+      padding: const EdgeInsets.symmetric(horizontal: 26, vertical: 8),
+      itemCount: _studios.length + 1,
+      itemBuilder: (context, index) {
+        if (index == _studios.length) return const SizedBox(height: 100);
+        final studio = _studios[index];
+        return Padding(
+          padding: const EdgeInsets.only(bottom: 12),
+          child: _FavoriteStudioCard(
+            name: studio['name'] ?? 'Studio',
+            categories: [(studio['category'] ?? 'General').toString()],
+            distance: '',
+            location: studio['location'] ?? 'Location',
+            rating: 4.9,
+            reviews: 100,
+            imagePath: 'assets/ZenFlowStudio.png',
+            networkImage: studio['cover_photo'],
+            onTap: () => Navigator.pushNamed(context, AppRoutes.studioDetails, arguments: studio['id']),
+            onToggleFavorite: () => _toggleFavoriteStudio(studio['id']),
+          ),
+        );
+      },
     );
   }
 
   Widget _buildClassesTab() {
-    return ListView(
-      padding: const EdgeInsets.symmetric(horizontal: 26),
-      children: const [
-        _FavoriteStudioCard(
-          name: 'Morning Vinyasa',
-          categories: ['Yoga', 'Flow'],
-          distance: '1.2 km away',
-          location: 'Downtown',
-          rating: 4.8,
-          reviews: 95,
-          imagePath: 'assets/ZenFlowStudio.png',
-        ),
-        SizedBox(height: 12),
-        _FavoriteStudioCard(
-          name: 'Reformer Pilates',
-          categories: ['Pilates', 'Core'],
-          distance: '2.1 km away',
-          location: 'Midtown',
-          rating: 4.9,
-          reviews: 112,
-          imagePath: 'assets/FitForseGym.png',
-        ),
-        SizedBox(height: 12),
-        _FavoriteStudioCard(
-          name: 'HIIT Training',
-          categories: ['HIIT', 'Cardio'],
-          distance: '3.5 km away',
-          location: 'Westside',
-          rating: 4.7,
-          reviews: 78,
-          imagePath: 'assets/ZenFlowStudio.png',
-        ),
-        SizedBox(height: 100),
-      ],
+    if (_classes.isEmpty) {
+      return ListView(
+        physics: const AlwaysScrollableScrollPhysics(),
+        children: const [
+          SizedBox(height: 100),
+          Center(child: Text('No favorite classes found')),
+        ],
+      );
+    }
+    return ListView.builder(
+      padding: const EdgeInsets.symmetric(horizontal: 26, vertical: 8),
+      itemCount: _classes.length + 1,
+      itemBuilder: (context, index) {
+        if (index == _classes.length) return const SizedBox(height: 100);
+        final cls = _classes[index];
+        final studio = cls['studio'] ?? {};
+        return Padding(
+          padding: const EdgeInsets.only(bottom: 12),
+          child: _FavoriteStudioCard(
+            name: cls['name'] ?? 'Class',
+            categories: [(studio['name'] ?? 'Studio').toString()],
+            distance: '',
+            location: studio['location'] ?? 'Location',
+            rating: 4.8,
+            reviews: 80,
+            imagePath: 'assets/FitForseGym.png',
+            networkImage: cls['image'],
+            onTap: () => Navigator.pushNamed(context, AppRoutes.classDetails, arguments: cls['id']),
+            onToggleFavorite: () => _toggleFavoriteClass(cls['id']),
+          ),
+        );
+      },
     );
   }
 }
@@ -221,6 +259,9 @@ class _FavoriteStudioCard extends StatefulWidget {
   final double rating;
   final int reviews;
   final String imagePath;
+  final String? networkImage;
+  final VoidCallback onTap;
+  final VoidCallback onToggleFavorite;
 
   const _FavoriteStudioCard({
     required this.name,
@@ -230,6 +271,9 @@ class _FavoriteStudioCard extends StatefulWidget {
     required this.rating,
     required this.reviews,
     required this.imagePath,
+    this.networkImage,
+    required this.onTap,
+    required this.onToggleFavorite,
   });
 
   @override
@@ -242,9 +286,7 @@ class _FavoriteStudioCardState extends State<_FavoriteStudioCard> {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () {
-        Navigator.pushNamed(context, AppRoutes.studioDetails);
-      },
+      onTap: widget.onTap,
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(

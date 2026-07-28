@@ -26,7 +26,14 @@ class ApiConstants {
   
   // Home/Studio Endpoints
   static const String classes = '$baseUrl/studios/classes/explore/';
+  static String classesSearch(String query) => '$baseUrl/studios/classes/explore/?search=$query';
   static String classDetails(int id) => '$baseUrl/studios/classes/$id/';
   static const String studios = '$baseUrl/studios/nearby/?latitude=23.8103&longitude=90.4125&radius=10000';
   static String studioDetails(int id) => '$baseUrl/studios/$id/';
+
+  // Favorites Endpoints
+  static const String favoriteStudios = '$baseUrl/studios/favorites/';
+  static const String favoriteClasses = '$baseUrl/studios/classes/favorites/';
+  static String toggleFavoriteStudio(int id) => '$baseUrl/studios/$id/favorite/';
+  static String toggleFavoriteClass(int id) => '$baseUrl/studios/classes/$id/favorite/';
 }

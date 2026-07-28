@@ -1,3 +1,4 @@
+import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter/material.dart';
 import '../../../../shared/widgets/custom_bottom_nav_bar.dart';
 import '../../../reservation/services/booking_service.dart';
@@ -186,6 +187,7 @@ class _BookingsScreenState extends State<BookingsScreen> {
         
         return _BookingCard(
           id: item['id'] ?? 0,
+          classId: studioClass['id'] ?? 0,
           className: studioClass['name'] ?? 'Class Name',
           studioName: studio['name'] ?? 'Studio Name',
           date: studioClass['date'] ?? 'Date',
@@ -251,6 +253,7 @@ class _TabItem extends StatelessWidget {
 
 class _BookingCard extends StatelessWidget {
   final int id;
+  final int classId;
   final String className;
   final String studioName;
   final String date;
@@ -264,6 +267,7 @@ class _BookingCard extends StatelessWidget {
 
   const _BookingCard({
     required this.id,
+    required this.classId,
     required this.className,
     required this.studioName,
     required this.date,
@@ -461,10 +465,18 @@ class _BookingCard extends StatelessWidget {
           SizedBox(
             width: double.infinity,
             child: GestureDetector(
-              onTap: () {
-                // Open map with location
-                // You can use url_launcher package or Google Maps
-                print('Opening map for: $location');
+              onTap: () async {
+                final encodedLocation = Uri.encodeComponent(location);
+                final uri = Uri.parse('https://www.google.com/maps/search/?api=1&query=$encodedLocation');
+                if (await canLaunchUrl(uri)) {
+                  await launchUrl(uri);
+                } else {
+                  if (context.mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Could not open map.')),
+                    );
+                  }
+                }
               },
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 8),
@@ -523,8 +535,13 @@ class _BookingCard extends StatelessWidget {
               children: [
                 GestureDetector(
                   onTap: () {
-                    // Navigate to booking details
-                    print('View details for: $className');
+                    if (classId > 0) {
+                      Navigator.pushNamed(
+                        context, 
+                        '/class-details',
+                        arguments: classId,
+                      );
+                    }
                   },
                   child: Row(
                     children: const [

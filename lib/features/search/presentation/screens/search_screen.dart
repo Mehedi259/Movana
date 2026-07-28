@@ -1,6 +1,8 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import '../../../../core/constants/app_routes.dart';
 import '../../../../shared/widgets/custom_bottom_nav_bar.dart';
+import '../../services/search_service.dart';
 
 class SearchScreen extends StatefulWidget {
   const SearchScreen({super.key});
@@ -11,6 +13,48 @@ class SearchScreen extends StatefulWidget {
 
 class _SearchScreenState extends State<SearchScreen> {
   String _selectedCategory = 'All';
+  final TextEditingController _searchController = TextEditingController();
+  Timer? _debounce;
+  bool _isLoading = false;
+  List<dynamic> _results = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchResults();
+  }
+
+  @override
+  void dispose() {
+    _debounce?.cancel();
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  void _onSearchChanged(String query) {
+    if (_debounce?.isActive ?? false) _debounce!.cancel();
+    _debounce = Timer(const Duration(milliseconds: 500), () {
+      _fetchResults();
+    });
+  }
+
+  Future<void> _fetchResults() async {
+    setState(() => _isLoading = true);
+    try {
+      final query = _searchController.text.trim();
+      final data = await SearchService.searchClasses(query);
+      if (mounted) {
+        setState(() {
+          _results = data;
+          _isLoading = false;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -68,14 +112,26 @@ class _SearchScreenState extends State<SearchScreen> {
                             color: Color(0x7F0F172A),
                           ),
                           const SizedBox(width: 12),
-                          const Expanded(
-                            child: Text(
-                              'Search yoga, gym, spa...',
-                              style: TextStyle(
-                                color: Color(0x7F0F172A),
+                          Expanded(
+                            child: TextField(
+                              controller: _searchController,
+                              onChanged: _onSearchChanged,
+                              decoration: const InputDecoration(
+                                hintText: 'Search yoga, gym, spa...',
+                                hintStyle: TextStyle(
+                                  color: Color(0x7F0F172A),
+                                  fontSize: 14,
+                                  fontFamily: 'Inter',
+                                  fontWeight: FontWeight.w400,
+                                ),
+                                border: InputBorder.none,
+                                isDense: true,
+                                contentPadding: EdgeInsets.zero,
+                              ),
+                              style: const TextStyle(
+                                color: Color(0xFF0F172A),
                                 fontSize: 14,
                                 fontFamily: 'Inter',
-                                fontWeight: FontWeight.w400,
                               ),
                             ),
                           ),
@@ -163,74 +219,56 @@ class _SearchScreenState extends State<SearchScreen> {
             
             // Results
             Expanded(
-              child: ListView(
-                padding: const EdgeInsets.symmetric(horizontal: 26),
-                children: [
-                  const Text(
-                    '24 results near you',
-                    style: TextStyle(
-                      color: Color(0xFF002212),
-                      fontSize: 16,
-                      fontFamily: 'Lexend',
-                      fontWeight: FontWeight.w600,
-                      height: 1.38,
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  _SearchResultCard(
-                    name: 'Zen Flow Studio',
-                    category: 'Yoga • Pilates',
-                    rating: 4.8,
-                    reviews: 312,
-                    distance: '0.8 mi',
-                    credits: '4+ Credits',
-                    imagePath: 'assets/ZenFlowStudio.png',
-                    onTap: () {
-                      Navigator.pushNamed(context, AppRoutes.studioDetails);
+              child: _isLoading 
+                ? const Center(child: CircularProgressIndicator(color: Color(0xFF0F5238)))
+                : ListView.builder(
+                    padding: const EdgeInsets.symmetric(horizontal: 26),
+                    itemCount: _results.length + 2, // +2 for title and bottom padding
+                    itemBuilder: (context, index) {
+                      if (index == 0) {
+                        return Padding(
+                          padding: const EdgeInsets.only(bottom: 12),
+                          child: Text(
+                            '${_results.length} results found',
+                            style: const TextStyle(
+                              color: Color(0xFF002212),
+                              fontSize: 16,
+                              fontFamily: 'Lexend',
+                              fontWeight: FontWeight.w600,
+                              height: 1.38,
+                            ),
+                          ),
+                        );
+                      }
+                      if (index == _results.length + 1) {
+                        return const SizedBox(height: 100);
+                      }
+                      
+                      final item = _results[index - 1];
+                      final studio = item['studio'] ?? {};
+                      
+                      return Padding(
+                        padding: const EdgeInsets.only(bottom: 16),
+                        child: _SearchResultCard(
+                          name: item['name'] ?? 'Class Name',
+                          category: studio['name'] ?? 'Studio',
+                          rating: 4.8,
+                          reviews: 120,
+                          distance: studio['location'] ?? 'Location',
+                          credits: '${item['credit_cost'] ?? 0} Credits',
+                          imagePath: 'assets/ZenFlowStudio.png', // Fallback
+                          networkImage: item['image'],
+                          onTap: () {
+                            Navigator.pushNamed(
+                              context, 
+                              AppRoutes.classDetails,
+                              arguments: item['id'],
+                            );
+                          },
+                        ),
+                      );
                     },
                   ),
-                  const SizedBox(height: 16),
-                  _SearchResultCard(
-                    name: 'FitForce Gym',
-                    category: 'Gym • HIIT',
-                    rating: 4.9,
-                    reviews: 450,
-                    distance: '1.2 mi',
-                    credits: '6+ Credits',
-                    imagePath: 'assets/FitForseGym.png',
-                    onTap: () {
-                      Navigator.pushNamed(context, AppRoutes.studioDetails);
-                    },
-                  ),
-                  const SizedBox(height: 16),
-                  _SearchResultCard(
-                    name: 'PurePilates Studio',
-                    category: 'Pilates',
-                    rating: 4.7,
-                    reviews: 189,
-                    distance: '2.5 mi',
-                    credits: '5+ Credits',
-                    imagePath: 'assets/ZenFlowStudio.png',
-                    onTap: () {
-                      Navigator.pushNamed(context, AppRoutes.studioDetails);
-                    },
-                  ),
-                  const SizedBox(height: 16),
-                  _SearchResultCard(
-                    name: 'Harmony Spa & GYM',
-                    category: 'Spa • Recovery',
-                    rating: 4.9,
-                    reviews: 189,
-                    distance: '2.5 mi',
-                    credits: '5+ Credits',
-                    imagePath: 'assets/FitForseGym.png',
-                    onTap: () {
-                      Navigator.pushNamed(context, AppRoutes.studioDetails);
-                    },
-                  ),
-                  const SizedBox(height: 100),
-                ],
-              ),
             ),
           ],
         ),
@@ -314,6 +352,7 @@ class _SearchResultCard extends StatelessWidget {
   final String distance;
   final String credits;
   final String imagePath;
+  final String? networkImage;
   final VoidCallback onTap;
 
   const _SearchResultCard({
@@ -324,6 +363,7 @@ class _SearchResultCard extends StatelessWidget {
     required this.distance,
     required this.credits,
     required this.imagePath,
+    this.networkImage,
     required this.onTap,
   });
 

@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
+import '../../../../core/constants/app_routes.dart';
+import '../../../../core/constants/api_constants.dart';
+import '../../../../core/utils/shared_prefs_helper.dart';
+import '../../../favorites/services/favorites_service.dart';
 import '../../services/studio_service.dart';
 import 'video_player_screen.dart';
 
@@ -166,8 +170,26 @@ class _StudioDetailsScreenState extends State<StudioDetailsScreen> {
                             const SizedBox(width: 8),
                             // Favorite Button
                             GestureDetector(
-                              onTap: () {
+                              onTap: () async {
+                                final studioId = _studio?['id'];
+                                if (studioId == null) return;
+                                
+                                final previousState = _isFavorite;
                                 setState(() => _isFavorite = !_isFavorite);
+                                
+                                try {
+                                  final newState = await FavoritesService.toggleFavoriteStudio(studioId);
+                                  if (mounted) {
+                                    setState(() => _isFavorite = newState);
+                                  }
+                                } catch (e) {
+                                  if (mounted) {
+                                    setState(() => _isFavorite = previousState);
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(content: Text('Failed to update favorite status')),
+                                    );
+                                  }
+                                }
                               },
                               child: Container(
                                 width: 36,
