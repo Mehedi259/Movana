@@ -25,6 +25,19 @@ class StudioService {
     }
   }
 
+  static Future<Map<String, dynamic>> getClassDetails(int id) async {
+    try {
+      final response = await http.get(
+        Uri.parse(ApiConstants.classDetails(id)),
+        headers: await _getHeaders(),
+      );
+      return _processResponse(response);
+    } catch (e) {
+      _handleException(e);
+      rethrow;
+    }
+  }
+
   static void _handleException(dynamic e) {
     print('API Error (Studio): $e');
     if (!e.toString().startsWith('Exception: ')) {

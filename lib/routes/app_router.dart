@@ -16,7 +16,7 @@ import '../features/bookings/presentation/screens/bookings_screen.dart';
 import '../features/favorites/presentation/screens/favorites_screen.dart';
 import '../features/profile/presentation/screens/profile_screen.dart';
 import '../features/studio/presentation/screens/studio_details_screen.dart';
-import '../features/class/presentation/screens/class_details_screen.dart';
+import '../features/class/presentation/screens/class_details_enhanced_screen.dart';
 import '../features/reservation/presentation/screens/reservation_screen.dart';
 import '../features/profile/presentation/screens/edit_profile_screen.dart';
 import '../features/profile/presentation/screens/fitness_interests_screen.dart';
@@ -81,7 +81,8 @@ class AppRouter {
         final studioId = settings.arguments as int?;
         return MaterialPageRoute(builder: (_) => StudioDetailsScreen(studioId: studioId));
       case AppRoutes.classDetails:
-        return MaterialPageRoute(builder: (_) => const ClassDetailsScreen());
+        final classId = settings.arguments as int?;
+        return MaterialPageRoute(builder: (_) => ClassDetailsEnhancedScreen(classId: classId));
       case AppRoutes.reservation:
         return MaterialPageRoute(builder: (_) => const ReservationScreen());
       

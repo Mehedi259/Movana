@@ -399,6 +399,12 @@ class _ClassScheduleScreenState extends State<ClassScheduleScreen> {
                                   spotsLeft: spotsLeft > 0 ? spotsLeft : null,
                                   isWaitlist: spotsLeft == 0,
                                   imagePath: imagePath,
+                                  onTap: () {
+                                    final classId = int.tryParse(cls['id']?.toString() ?? '');
+                                    if (classId != null) {
+                                      Navigator.pushNamed(context, AppRoutes.classDetails, arguments: classId);
+                                    }
+                                  },
                                 ),
                               );
                             },
@@ -420,6 +426,7 @@ class _ClassCard extends StatelessWidget {
   final int? spotsLeft;
   final bool isWaitlist;
   final String imagePath;
+  final VoidCallback? onTap;
 
   const _ClassCard({
     required this.title,
@@ -431,6 +438,7 @@ class _ClassCard extends StatelessWidget {
     this.spotsLeft,
     this.isWaitlist = false,
     required this.imagePath,
+    this.onTap,
   });
 
   @override
@@ -461,9 +469,7 @@ class _ClassCard extends StatelessWidget {
         child: Material(
           color: Colors.transparent,
           child: InkWell(
-            onTap: () {
-              Navigator.pushNamed(context, AppRoutes.classDetails);
-            },
+            onTap: onTap,
             child: Padding(
               padding: const EdgeInsets.all(16),
               child: Column(
@@ -575,11 +581,15 @@ class _ClassCard extends StatelessWidget {
                   const SizedBox(height: 16),
                   const Divider(height: 1, color: Color(0xFFF3F4F6)),
                   const SizedBox(height: 16),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  Wrap(
+                    alignment: WrapAlignment.spaceBetween,
+                    crossAxisAlignment: WrapCrossAlignment.center,
+                    spacing: 8,
+                    runSpacing: 8,
                     children: [
                       Wrap(
                         spacing: 8,
+                        runSpacing: 8,
                         children: [
                           _buildTag(
                             '$credits credits',

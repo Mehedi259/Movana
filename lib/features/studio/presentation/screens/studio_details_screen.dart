@@ -407,6 +407,12 @@ class _StudioDetailsScreenState extends State<StudioDetailsScreen> {
                                 spots: '${cls['capacity'] ?? 10} spots',
                                 spotsColor: const Color(0xFFD9E6DA),
                                 spotsTextColor: const Color(0xFF5B675E),
+                                onTap: () {
+                                  final classId = int.tryParse(cls['id']?.toString() ?? '');
+                                  if (classId != null) {
+                                    Navigator.pushNamed(context, '/class-details', arguments: classId);
+                                  }
+                                },
                               ),
                             );
                           })
@@ -881,6 +887,7 @@ class _ClassTimeCard extends StatelessWidget {
   final Color spotsColor;
   final Color spotsTextColor;
   final bool hasBorder;
+  final VoidCallback? onTap;
 
   const _ClassTimeCard({
     required this.time,
@@ -891,23 +898,26 @@ class _ClassTimeCard extends StatelessWidget {
     required this.spotsColor,
     required this.spotsTextColor,
     this.hasBorder = false,
+    this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: const Color(0xFFF8FAF6),
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: const [
-          BoxShadow(
-            color: Color(0x0A000000),
-            blurRadius: 12,
-            offset: Offset(0, 2),
-          ),
-        ],
-      ),
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: const Color(0xFFF8FAF6),
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: const [
+            BoxShadow(
+              color: Color(0x0A000000),
+              blurRadius: 12,
+              offset: Offset(0, 2),
+            ),
+          ],
+        ),
       child: Row(
         children: [
           // Time Section
@@ -1002,6 +1012,6 @@ class _ClassTimeCard extends StatelessWidget {
           ),
         ],
       ),
-    );
+    ));
   }
 }

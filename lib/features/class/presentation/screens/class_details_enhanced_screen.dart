@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_routes.dart';
+import '../../../studio/services/studio_service.dart';
 
 class ClassDetailsEnhancedScreen extends StatefulWidget {
-  const ClassDetailsEnhancedScreen({super.key});
+  final int? classId;
+
+  const ClassDetailsEnhancedScreen({super.key, this.classId});
 
   @override
   State<ClassDetailsEnhancedScreen> createState() => _ClassDetailsEnhancedScreenState();
@@ -12,10 +16,113 @@ class ClassDetailsEnhancedScreen extends StatefulWidget {
 class _ClassDetailsEnhancedScreenState extends State<ClassDetailsEnhancedScreen> {
   bool _isFavorite = false;
   int _currentImageIndex = 0;
-  final int _totalImages = 8;
+  
+  bool _isLoading = true;
+  String? _error;
+  Map<String, dynamic>? _classData;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchClassDetails();
+  }
+
+  Future<void> _fetchClassDetails() async {
+    if (widget.classId == null) {
+      setState(() {
+        _error = 'No class ID provided';
+        _isLoading = false;
+      });
+      return;
+    }
+
+    try {
+      setState(() {
+        _isLoading = true;
+        _error = null;
+      });
+      final data = await StudioService.getClassDetails(widget.classId!);
+      setState(() {
+        _classData = data;
+        _isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        _error = e.toString();
+        _isLoading = false;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
+    if (_isLoading) {
+      return const Scaffold(
+        body: Center(
+          child: CircularProgressIndicator(color: AppColors.primary),
+        ),
+      );
+    }
+
+    if (_error != null || _classData == null) {
+      return Scaffold(
+        appBar: AppBar(
+          title: const Text('Error', style: TextStyle(color: Colors.black)),
+          backgroundColor: Colors.white,
+          iconTheme: const IconThemeData(color: Colors.black),
+          elevation: 0,
+        ),
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(_error ?? 'Class not found', style: const TextStyle(color: Colors.red)),
+              const SizedBox(height: 16),
+              ElevatedButton(
+                onPressed: _fetchClassDetails,
+                child: const Text('Retry'),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
+    final images = _classData!['images'] as List? ?? [];
+    final totalImages = images.isNotEmpty ? images.length : 1;
+    final name = _classData!['name']?.toString() ?? 'Class Details';
+    final studioName = _classData!['studio_name']?.toString() ?? 'Studio';
+    
+    // Formatting Date & Time
+    final dateStr = _classData!['date']?.toString();
+    final timeStr = _classData!['start_time']?.toString();
+    final duration = int.tryParse(_classData!['duration_minutes']?.toString() ?? '60') ?? 60;
+    
+    String displayDate = 'Date TBA';
+    String displayTime = 'Time TBA';
+    
+    if (dateStr != null) {
+      try {
+        final parsedDate = DateTime.parse(dateStr);
+        displayDate = DateFormat('EEE, MMM d').format(parsedDate);
+      } catch (_) {}
+    }
+    
+    if (timeStr != null && timeStr.length > 5) {
+      try {
+        final parsedTime = DateFormat('HH:mm:ss').parse(timeStr);
+        final endTime = parsedTime.add(Duration(minutes: duration));
+        displayTime = '${DateFormat('h:mm a').format(parsedTime)} - ${DateFormat('h:mm a').format(endTime)} ($duration min)';
+      } catch (_) {}
+    }
+    
+    final instructorName = _classData!['instructor_name']?.toString() ?? 'Instructor';
+    final instructorDesignation = _classData!['instructor_designation']?.toString();
+    final instructorImage = _classData!['instructor_image']?.toString();
+    
+    final description = _classData!['description']?.toString() ?? 'No description available.';
+    final price = double.tryParse(_classData!['price']?.toString() ?? '0') ?? 0;
+    
     return Scaffold(
       body: CustomScrollView(
         slivers: [
@@ -27,11 +134,33 @@ class _ClassDetailsEnhancedScreenState extends State<ClassDetailsEnhancedScreen>
               background: Stack(
                 fit: StackFit.expand,
                 children: [
-                  Container(
-                    color: Colors.grey[300],
-                    child: const Center(
-                      child: Icon(Icons.fitness_center, size: 80, color: Colors.white54),
-                    ),
+                  PageView.builder(
+                    itemCount: totalImages,
+                    onPageChanged: (index) {
+                      setState(() {
+                        _currentImageIndex = index;
+                      });
+                    },
+                    itemBuilder: (context, index) {
+                      if (images.isNotEmpty && images[index]['image'] != null) {
+                         return Image.network(
+                           images[index]['image'],
+                           fit: BoxFit.cover,
+                           errorBuilder: (context, error, stackTrace) => Container(
+                             color: Colors.grey[300],
+                             child: const Center(
+                               child: Icon(Icons.fitness_center, size: 80, color: Colors.white54),
+                             ),
+                           ),
+                         );
+                      }
+                      return Container(
+                        color: Colors.grey[300],
+                        child: const Center(
+                          child: Icon(Icons.fitness_center, size: 80, color: Colors.white54),
+                        ),
+                      );
+                    },
                   ),
                   Positioned(
                     bottom: 16,
@@ -43,7 +172,7 @@ class _ClassDetailsEnhancedScreenState extends State<ClassDetailsEnhancedScreen>
                         borderRadius: BorderRadius.circular(20),
                       ),
                       child: Text(
-                        '${_currentImageIndex + 1} / $_totalImages',
+                        '${_currentImageIndex + 1} / $totalImages',
                         style: const TextStyle(
                           color: Colors.white,
                           fontSize: 12,
@@ -80,10 +209,10 @@ class _ClassDetailsEnhancedScreenState extends State<ClassDetailsEnhancedScreen>
                       // Class Title and Rating
                       Row(
                         children: [
-                          const Expanded(
+                          Expanded(
                             child: Text(
-                              'Reformer Pilates',
-                              style: TextStyle(
+                              name,
+                              style: const TextStyle(
                                 fontSize: 24,
                                 fontWeight: FontWeight.bold,
                               ),
@@ -114,30 +243,24 @@ class _ClassDetailsEnhancedScreenState extends State<ClassDetailsEnhancedScreen>
                       const SizedBox(height: 8),
                       Row(
                         children: [
-                          Text(
-                            'Camden Court',
-                            style: TextStyle(
-                              color: AppColors.textSecondary,
-                              fontSize: 14,
-                            ),
-                          ),
-                          Text(
-                            ' • ',
-                            style: TextStyle(
-                              color: AppColors.textSecondary,
-                            ),
-                          ),
-                          GestureDetector(
-                            onTap: () {
-                              Navigator.pushNamed(context, AppRoutes.studioDetails);
-                            },
-                            child: Text(
-                              'Zen Flow Studio >',
-                              style: TextStyle(
-                                color: AppColors.primary,
-                                fontSize: 14,
-                                fontWeight: FontWeight.w600,
-                              ),
+                          Expanded(
+                            child: Wrap(
+                              crossAxisAlignment: WrapCrossAlignment.center,
+                              children: [
+                                GestureDetector(
+                                  onTap: () {
+                                     // Ensure we have studio_id to navigate if needed
+                                  },
+                                  child: Text(
+                                    studioName,
+                                    style: TextStyle(
+                                      color: AppColors.primary,
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
                         ],
@@ -159,15 +282,15 @@ class _ClassDetailsEnhancedScreenState extends State<ClassDetailsEnhancedScreen>
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  const Text(
-                                    'Mon, Mar 16',
-                                    style: TextStyle(
+                                  Text(
+                                    displayDate,
+                                    style: const TextStyle(
                                       fontWeight: FontWeight.w600,
                                       fontSize: 15,
                                     ),
                                   ),
                                   Text(
-                                    '7:00 AM - 7:50 AM (50 min)',
+                                    displayTime,
                                     style: TextStyle(
                                       color: AppColors.textSecondary,
                                       fontSize: 13,
@@ -206,25 +329,32 @@ class _ClassDetailsEnhancedScreenState extends State<ClassDetailsEnhancedScreen>
                         ),
                         child: Row(
                           children: [
-                            CircleAvatar(
-                              radius: 24,
-                              backgroundColor: Colors.grey[300],
-                              child: const Icon(Icons.person),
-                            ),
+                            if (instructorImage != null && instructorImage.isNotEmpty)
+                              CircleAvatar(
+                                radius: 24,
+                                backgroundImage: NetworkImage(instructorImage),
+                                backgroundColor: Colors.grey[300],
+                              )
+                            else
+                              CircleAvatar(
+                                radius: 24,
+                                backgroundColor: Colors.grey[300],
+                                child: const Icon(Icons.person),
+                              ),
                             const SizedBox(width: 12),
                             Expanded(
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  const Text(
-                                    'Giovanna Williams',
-                                    style: TextStyle(
+                                  Text(
+                                    instructorName,
+                                    style: const TextStyle(
                                       fontWeight: FontWeight.w600,
                                       fontSize: 15,
                                     ),
                                   ),
                                   Text(
-                                    'Instructor',
+                                    instructorDesignation ?? 'Instructor',
                                     style: TextStyle(
                                       color: AppColors.textSecondary,
                                       fontSize: 13,
@@ -254,130 +384,11 @@ class _ClassDetailsEnhancedScreenState extends State<ClassDetailsEnhancedScreen>
                       ),
                       const SizedBox(height: 12),
                       Text(
-                        'Experience a full-body workout designed to improve strength, flexibility, and posture. Using the reformer machine, this class focuses on slow, controlled movements that engage your deep core muscles. Suitable for all levels, modifications will be provided throughout.',
+                        description,
                         style: TextStyle(
                           color: AppColors.textSecondary,
                           fontSize: 14,
                           height: 1.6,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 24),
-                // How to prepare
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text(
-                        'How to prepare',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      const SizedBox(height: 12),
-                      Text(
-                        'Please arrive 10 minutes before the class starts to get settled.',
-                        style: TextStyle(
-                          color: AppColors.textSecondary,
-                          fontSize: 14,
-                          height: 1.6,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 24),
-                // What to bring
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text(
-                        'What to bring',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      const SizedBox(height: 12),
-                      _BringItem(icon: Icons.checkroom, text: 'Yoga mat'),
-                      _BringItem(icon: Icons.water_drop, text: 'Water'),
-                      _BringItem(icon: Icons.checkroom, text: 'Grip socks (Required)'),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 24),
-                // Amenities
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text(
-                        'Amenities',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      const SizedBox(height: 12),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceAround,
-                        children: [
-                          _AmenityIcon(icon: Icons.shower, label: 'Shower'),
-                          _AmenityIcon(icon: Icons.lock, label: 'Lockers'),
-                          _AmenityIcon(icon: Icons.local_parking, label: 'Parking'),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 24),
-                // How to get there
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text(
-                        'How to get there',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      const SizedBox(height: 12),
-                      Text(
-                        '123 Camden Court, Dublin 2, Ireland',
-                        style: TextStyle(
-                          color: AppColors.textSecondary,
-                          fontSize: 14,
-                        ),
-                      ),
-                      const SizedBox(height: 12),
-                      Container(
-                        height: 150,
-                        decoration: BoxDecoration(
-                          color: Colors.grey[200],
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Center(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(Icons.map, size: 60, color: Colors.grey[400]),
-                              const SizedBox(height: 8),
-                              Text(
-                                'Map View',
-                                style: TextStyle(color: Colors.grey[600]),
-                              ),
-                            ],
-                          ),
                         ),
                       ),
                     ],
@@ -404,7 +415,7 @@ class _ClassDetailsEnhancedScreenState extends State<ClassDetailsEnhancedScreen>
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              '2 credits',
+                              '${price.toInt()} credits',
                               style: TextStyle(
                                 fontSize: 20,
                                 fontWeight: FontWeight.bold,
@@ -438,6 +449,7 @@ class _ClassDetailsEnhancedScreenState extends State<ClassDetailsEnhancedScreen>
                             style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.w600,
+                              color: Colors.white,
                             ),
                           ),
                         ),
@@ -450,64 +462,6 @@ class _ClassDetailsEnhancedScreenState extends State<ClassDetailsEnhancedScreen>
           ),
         ],
       ),
-    );
-  }
-}
-
-class _BringItem extends StatelessWidget {
-  final IconData icon;
-  final String text;
-
-  const _BringItem({required this.icon, required this.text});
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 8),
-      child: Row(
-        children: [
-          Icon(icon, size: 20, color: AppColors.textSecondary),
-          const SizedBox(width: 12),
-          Text(
-            text,
-            style: TextStyle(
-              color: AppColors.textSecondary,
-              fontSize: 14,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _AmenityIcon extends StatelessWidget {
-  final IconData icon;
-  final String label;
-
-  const _AmenityIcon({required this.icon, required this.label});
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Container(
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: AppColors.primary.withValues(alpha: 0.1),
-            shape: BoxShape.circle,
-          ),
-          child: Icon(icon, color: AppColors.primary, size: 28),
-        ),
-        const SizedBox(height: 8),
-        Text(
-          label,
-          style: TextStyle(
-            color: AppColors.textSecondary,
-            fontSize: 12,
-          ),
-        ),
-      ],
     );
   }
 }

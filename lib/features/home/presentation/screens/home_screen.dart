@@ -445,7 +445,10 @@ class _HomeScreenState extends State<HomeScreen> {
                                 ? (cls['images'][0]['image'] ?? '')
                                 : 'assets/Morning.png',
                             onTap: () {
-                              Navigator.pushNamed(context, AppRoutes.classDetails);
+                              final classId = int.tryParse(cls['id']?.toString() ?? '');
+                              if (classId != null) {
+                                Navigator.pushNamed(context, AppRoutes.classDetails, arguments: classId);
+                              }
                             },
                           ),
                         ),
