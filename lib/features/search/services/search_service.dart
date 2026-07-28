@@ -19,7 +19,9 @@ class SearchService {
     if (response.statusCode == 200) {
       final decodedData = utf8.decode(response.bodyBytes);
       final jsonResponse = jsonDecode(decodedData);
-      return jsonResponse['results'] ?? [];
+      if (jsonResponse is List) return jsonResponse;
+      if (jsonResponse is Map && jsonResponse.containsKey('results')) return jsonResponse['results'] as List;
+      return [jsonResponse];
     } else {
       throw Exception('Failed to load search results: ${response.statusCode}');
     }

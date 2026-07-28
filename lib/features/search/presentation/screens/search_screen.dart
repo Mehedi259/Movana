@@ -1,9 +1,12 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:latlong2/latlong.dart';
 import '../../../../core/constants/app_routes.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../shared/widgets/custom_bottom_nav_bar.dart';
 import '../../services/search_service.dart';
+import '../../../home/services/home_service.dart';
 
 class SearchScreen extends StatefulWidget {
   const SearchScreen({super.key});
@@ -18,6 +21,10 @@ class _SearchScreenState extends State<SearchScreen> {
   Timer? _debounce;
   bool _isLoading = false;
   List<dynamic> _results = [];
+  
+  // Location and Distance Filter
+  Position? _currentPosition;
+  double _selectedDistance = 20.0; // max 20km
 
   final List<String> _categories = ['All', 'Yoga', 'Gym', 'Pilates', 'Spa', 'Boxing', 'Cycling'];
 
@@ -25,6 +32,30 @@ class _SearchScreenState extends State<SearchScreen> {
   void initState() {
     super.initState();
     _fetchResults();
+    _determinePosition();
+  }
+
+  Future<void> _determinePosition() async {
+    bool serviceEnabled;
+    LocationPermission permission;
+
+    serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) return;
+
+    permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) return;
+    }
+
+    if (permission == LocationPermission.deniedForever) return;
+
+    final position = await Geolocator.getCurrentPosition();
+    if (mounted) {
+      setState(() {
+        _currentPosition = position;
+      });
+    }
   }
 
   @override
@@ -45,10 +76,16 @@ class _SearchScreenState extends State<SearchScreen> {
     setState(() => _isLoading = true);
     try {
       final query = _searchController.text.trim();
-      final data = await SearchService.searchClasses(query);
+      final classesData = await SearchService.searchClasses(query);
+      
+      List<dynamic> studiosData = [];
+      try {
+        studiosData = await HomeService.getStudios();
+      } catch (_) {}
+
       if (mounted) {
         setState(() {
-          _results = data;
+          _results = [...classesData, ...studiosData];
           _isLoading = false;
         });
       }
@@ -60,13 +97,37 @@ class _SearchScreenState extends State<SearchScreen> {
   }
 
   List<dynamic> get _filteredResults {
-    if (_selectedCategory == 'All') return _results;
-    return _results.where((item) {
-      final name = (item['name'] ?? '').toString().toLowerCase();
-      final studioName = ((item['studio'] is Map) ? (item['studio']['name'] ?? '') : (item['studio_name'] ?? '')).toString().toLowerCase();
-      final searchStr = '$name $studioName';
-      return searchStr.contains(_selectedCategory.toLowerCase());
-    }).toList();
+    List<dynamic> categoryFiltered = _results;
+    if (_selectedCategory != 'All') {
+      categoryFiltered = _results.where((item) {
+        final name = (item['name'] ?? '').toString().toLowerCase();
+        final studioName = ((item['studio'] is Map) ? (item['studio']['name'] ?? '') : (item['studio_name'] ?? '')).toString().toLowerCase();
+        final searchStr = '$name $studioName';
+        return searchStr.contains(_selectedCategory.toLowerCase());
+      }).toList();
+    }
+
+    // Distance Filter
+    if (_currentPosition != null && _selectedDistance < 20.0) {
+      return categoryFiltered.where((item) {
+        final latStr = item['latitude']?.toString();
+        final lngStr = item['longitude']?.toString();
+        if (latStr == null || lngStr == null) return true; // If no location, assume it passes or fail based on logic. Let's pass it for now.
+        
+        final lat = double.tryParse(latStr);
+        final lng = double.tryParse(lngStr);
+        if (lat == null || lng == null) return true;
+
+        final double distanceInKm = const Distance().as(
+          LengthUnit.Kilometer,
+          LatLng(_currentPosition!.latitude, _currentPosition!.longitude),
+          LatLng(lat, lng),
+        );
+        return distanceInKm <= _selectedDistance;
+      }).toList();
+    }
+    
+    return categoryFiltered;
   }
 
   void _showFilterBottomSheet() {
@@ -76,45 +137,64 @@ class _SearchScreenState extends State<SearchScreen> {
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
       builder: (context) {
-        return Container(
-          padding: const EdgeInsets.all(24),
-          decoration: const BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text(
-                'Filters',
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                ),
+        return StatefulBuilder(
+          builder: (context, setModalState) {
+            return Container(
+              padding: const EdgeInsets.all(24),
+              decoration: const BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
               ),
-              const SizedBox(height: 24),
-              const Text('Distance', style: TextStyle(fontWeight: FontWeight.w600)),
-              Slider(value: 5, min: 1, max: 20, activeColor: AppColors.primary, onChanged: (v) {}),
-              const Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [Text('1 km'), Text('20 km')],
-              ),
-              const SizedBox(height: 24),
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: () => Navigator.pop(context),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.primary,
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'Filters',
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
-                  child: const Text('Apply Filters', style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w600)),
-                ),
-              )
-            ],
-          ),
+                  const SizedBox(height: 24),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text('Distance', style: TextStyle(fontWeight: FontWeight.w600)),
+                      Text('${_selectedDistance.toInt()} km', style: const TextStyle(color: AppColors.primary, fontWeight: FontWeight.bold)),
+                    ],
+                  ),
+                  Slider(
+                    value: _selectedDistance,
+                    min: 1,
+                    max: 20,
+                    activeColor: AppColors.primary,
+                    onChanged: (v) {
+                      setModalState(() => _selectedDistance = v);
+                      setState(() => _selectedDistance = v);
+                    }
+                  ),
+                  const Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [Text('1 km'), Text('20 km')],
+                  ),
+                  const SizedBox(height: 24),
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      onPressed: () => Navigator.pop(context),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.primary,
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      ),
+                      child: const Text('Apply Filters', style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w600)),
+                    ),
+                  )
+                ],
+              ),
+            );
+          }
         );
       },
     );
@@ -274,8 +354,8 @@ class _SearchScreenState extends State<SearchScreen> {
                           rating: 4.8,
                           reviews: 120,
                           distance: location.toString(),
-                          credits: '${item['credit_cost'] ?? 0} Credits',
-                          networkImage: item['image'],
+                          credits: '${item['credit_cost'] ?? item['start_credit'] ?? 0} Credits',
+                          networkImage: item['image'] ?? item['cover_photo'],
                           onTap: () {
                             Navigator.pushNamed(
                               context, 
@@ -412,22 +492,27 @@ class _SearchResultCard extends StatelessWidget {
         child: Row(
           children: [
             // Image
-            Container(
-              width: 100,
-              height: 100,
-              decoration: BoxDecoration(
+            ClipRRect(
+              borderRadius: BorderRadius.circular(16),
+              child: Container(
+                width: 90,
+                height: 90,
                 color: Colors.grey.shade100,
-                borderRadius: BorderRadius.circular(16),
-                image: DecorationImage(
-                  image: (networkImage != null && networkImage!.isNotEmpty)
-                      ? NetworkImage(
-                          networkImage!.startsWith('http')
-                              ? networkImage!
-                              : 'http://16.170.40.206:8000$networkImage'
-                        ) as ImageProvider
-                      : const AssetImage('assets/ZenFlowStudio.png'),
-                  fit: BoxFit.cover,
-                ),
+                child: (networkImage != null && networkImage!.isNotEmpty)
+                    ? Image.network(
+                        networkImage!.startsWith('http')
+                            ? networkImage!
+                            : 'http://16.170.40.206:8000$networkImage',
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) => Image.asset(
+                          'assets/ZenFlowStudio.png',
+                          fit: BoxFit.cover,
+                        ),
+                      )
+                    : Image.asset(
+                        'assets/ZenFlowStudio.png',
+                        fit: BoxFit.cover,
+                      ),
               ),
             ),
             const SizedBox(width: 16),
