@@ -322,6 +322,7 @@ class _SearchMapScreenState extends State<SearchMapScreen> {
                                         reviews: '(120)',
                                         distance: studio['full_address'] ?? studio['city'] ?? 'Unknown location',
                                         imagePath: studio['cover_photo'], // using network image if available
+                                        isFavorite: studio['is_favorite'] == true,
                                         onTap: () {
                                           Navigator.pushNamed(context, AppRoutes.studioDetails, arguments: studio['id']);
                                         },
@@ -347,6 +348,7 @@ class _SearchMapScreenState extends State<SearchMapScreen> {
     required String reviews,
     required String distance,
     required String? imagePath,
+    required bool isFavorite,
     required VoidCallback onTap,
   }) {
     return GestureDetector(
@@ -368,18 +370,21 @@ class _SearchMapScreenState extends State<SearchMapScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Image
-            Container(
-              width: 80,
-              height: 80,
-              decoration: BoxDecoration(
+            ClipRRect(
+              borderRadius: BorderRadius.circular(16),
+              child: Container(
+                width: 80,
+                height: 80,
                 color: Colors.grey.shade100,
-                borderRadius: BorderRadius.circular(16),
-                image: DecorationImage(
-                  image: (imagePath != null && imagePath.isNotEmpty)
-                      ? NetworkImage(imagePath.startsWith('http') ? imagePath : 'http://16.170.40.206:8000$imagePath') as ImageProvider
-                      : const AssetImage('assets/ZenFlowStudio.png'),
-                  fit: BoxFit.cover,
-                ),
+                child: (imagePath != null && imagePath.isNotEmpty)
+                    ? Image.network(
+                        imagePath.startsWith('http') ? imagePath : 'http://16.170.40.206:8000$imagePath',
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) {
+                          return Image.asset('assets/ZenFlowStudio.png', fit: BoxFit.cover);
+                        },
+                      )
+                    : Image.asset('assets/ZenFlowStudio.png', fit: BoxFit.cover),
               ),
             ),
             const SizedBox(width: 16),
@@ -399,7 +404,11 @@ class _SearchMapScreenState extends State<SearchMapScreen> {
                           overflow: TextOverflow.ellipsis,
                         ),
                       ),
-                      const Icon(Icons.favorite_border, color: Color(0xFF6B7280), size: 20),
+                      Icon(
+                        isFavorite ? Icons.favorite : Icons.favorite_border,
+                        color: isFavorite ? Colors.red : const Color(0xFF6B7280),
+                        size: 20,
+                      ),
                     ],
                   ),
                   const SizedBox(height: 4),

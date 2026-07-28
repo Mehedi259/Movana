@@ -310,24 +310,22 @@ class _FavoriteStudioCardState extends State<_FavoriteStudioCard> {
         child: Row(
           children: [
             // Image
-            Container(
-              width: 96,
-              height: 96,
-              decoration: BoxDecoration(
+            ClipRRect(
+              borderRadius: BorderRadius.circular(12),
+              child: Container(
+                width: 96,
+                height: 96,
                 color: const Color(0xFFE1E3DF),
-                borderRadius: BorderRadius.circular(12),
-                image: DecorationImage(
-                  image: (widget.networkImage != null && widget.networkImage!.isNotEmpty)
-                      ? NetworkImage(
-                          widget.networkImage!.startsWith('http')
-                              ? widget.networkImage!
-                              : 'http://16.170.40.206:8000${widget.networkImage}'
-                        ) as ImageProvider
-                      : (widget.imagePath.startsWith('http')
-                          ? NetworkImage(widget.imagePath) as ImageProvider
-                          : AssetImage(widget.imagePath)),
-                  fit: BoxFit.cover,
-                ),
+                child: (widget.networkImage != null && widget.networkImage!.isNotEmpty)
+                    ? Image.network(
+                        widget.networkImage!.startsWith('http')
+                            ? widget.networkImage!
+                            : 'http://16.170.40.206:8000${widget.networkImage}',
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) =>
+                            Image.asset('assets/ZenFlowStudio.png', fit: BoxFit.cover),
+                      )
+                    : Image.asset(widget.imagePath, fit: BoxFit.cover),
               ),
             ),
             const SizedBox(width: 16),
@@ -371,6 +369,7 @@ class _FavoriteStudioCardState extends State<_FavoriteStudioCard> {
                       GestureDetector(
                         onTap: () {
                           setState(() => _isFavorite = !_isFavorite);
+                          widget.onToggleFavorite();
                         },
                         child: Icon(
                           _isFavorite ? Icons.favorite : Icons.favorite_border,
