@@ -24,7 +24,8 @@ class _SearchScreenState extends State<SearchScreen> {
   
   // Location and Distance Filter
   Position? _currentPosition;
-  double _selectedDistance = 20.0; // max 20km
+  // Type Filter
+  String _selectedType = 'All'; // 'All', 'Class', 'Studio'
 
   final List<String> _categories = ['All', 'Yoga', 'Gym', 'Pilates', 'Spa', 'Boxing', 'Cycling'];
 
@@ -107,23 +108,13 @@ class _SearchScreenState extends State<SearchScreen> {
       }).toList();
     }
 
-    // Distance Filter
-    if (_currentPosition != null && _selectedDistance < 20.0) {
-      return categoryFiltered.where((item) {
-        final latStr = item['latitude']?.toString();
-        final lngStr = item['longitude']?.toString();
-        if (latStr == null || lngStr == null) return true; // If no location, assume it passes or fail based on logic. Let's pass it for now.
-        
-        final lat = double.tryParse(latStr);
-        final lng = double.tryParse(lngStr);
-        if (lat == null || lng == null) return true;
-
-        final double distanceInKm = const Distance().as(
-          LengthUnit.Kilometer,
-          LatLng(_currentPosition!.latitude, _currentPosition!.longitude),
-          LatLng(lat, lng),
-        );
-        return distanceInKm <= _selectedDistance;
+    // Type Filter
+    if (_selectedType != 'All') {
+      categoryFiltered = categoryFiltered.where((item) {
+        final isClass = item['credit_cost'] != null || item['studio'] != null;
+        if (_selectedType == 'Class') return isClass;
+        if (_selectedType == 'Studio') return !isClass;
+        return true;
       }).toList();
     }
     
@@ -157,28 +148,27 @@ class _SearchScreenState extends State<SearchScreen> {
                     ),
                   ),
                   const SizedBox(height: 24),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const Text('Distance', style: TextStyle(fontWeight: FontWeight.w600)),
-                      Text('${_selectedDistance.toInt()} km', style: const TextStyle(color: AppColors.primary, fontWeight: FontWeight.bold)),
-                    ],
+                  const Text('Type', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16)),
+                  const SizedBox(height: 12),
+                  Wrap(
+                    spacing: 12,
+                    children: ['All', 'Class', 'Studio'].map((type) {
+                      final isSelected = _selectedType == type;
+                      return ChoiceChip(
+                        label: Text(type),
+                        selected: isSelected,
+                        selectedColor: AppColors.primary,
+                        labelStyle: TextStyle(color: isSelected ? Colors.white : Colors.black87),
+                        onSelected: (selected) {
+                          if (selected) {
+                            setModalState(() => _selectedType = type);
+                            setState(() => _selectedType = type);
+                          }
+                        },
+                      );
+                    }).toList(),
                   ),
-                  Slider(
-                    value: _selectedDistance,
-                    min: 1,
-                    max: 20,
-                    activeColor: AppColors.primary,
-                    onChanged: (v) {
-                      setModalState(() => _selectedDistance = v);
-                      setState(() => _selectedDistance = v);
-                    }
-                  ),
-                  const Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [Text('1 km'), Text('20 km')],
-                  ),
-                  const SizedBox(height: 24),
+                  const SizedBox(height: 32),
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
@@ -355,7 +345,7 @@ class _SearchScreenState extends State<SearchScreen> {
                           reviews: 120,
                           distance: location.toString(),
                           credits: '${item['credit_cost'] ?? item['start_credit'] ?? 0} Credits',
-                          networkImage: item['image'] ?? item['cover_photo'],
+                          networkImage: item['image'] ?? item['cover_photo'] ?? (item['images'] != null && (item['images'] as List).isNotEmpty ? item['images'][0]['image'] : null),
                           onTap: () {
                             Navigator.pushNamed(
                               context, 

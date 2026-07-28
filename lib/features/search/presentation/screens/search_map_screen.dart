@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:geolocator/geolocator.dart';
 import '../../../../core/constants/app_routes.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../home/services/home_service.dart';
@@ -13,14 +14,14 @@ class SearchMapScreen extends StatefulWidget {
 }
 
 class _SearchMapScreenState extends State<SearchMapScreen> {
+  final List<String> _topCategories = ['All', 'Yoga', 'Gym', 'Pilates', 'Spa'];
   String _selectedTopCategory = 'All';
-  String _selectedDay = 'All';
-
-  final List<String> _topCategories = ['All', 'Yoga', 'Gym', 'Pilates', 'Spa', 'Sauna'];
-  final List<String> _days = ['All', 'Today', 'Tue-28', 'Wed-29', 'Thu-30'];
-
   List<dynamic> _studios = [];
   bool _isLoading = true;
+  
+  // Location and Filter
+  Position? _currentPosition;
+  double _selectedDistance = 20.0;
   
   // Default to Dhaka
   final LatLng _defaultLocation = const LatLng(23.779468, 90.404630);
@@ -30,6 +31,30 @@ class _SearchMapScreenState extends State<SearchMapScreen> {
   void initState() {
     super.initState();
     _fetchStudios();
+    _determinePosition();
+  }
+
+  Future<void> _determinePosition() async {
+    bool serviceEnabled;
+    LocationPermission permission;
+
+    serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) return;
+
+    permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) return;
+    }
+
+    if (permission == LocationPermission.deniedForever) return;
+
+    final position = await Geolocator.getCurrentPosition();
+    if (mounted) {
+      setState(() {
+        _currentPosition = position;
+      });
+    }
   }
 
   Future<void> _fetchStudios() async {
@@ -57,44 +82,93 @@ class _SearchMapScreenState extends State<SearchMapScreen> {
     }
   }
 
+  List<dynamic> get _filteredStudios {
+    List<dynamic> filtered = _studios;
+    if (_selectedTopCategory != 'All') {
+      filtered = filtered.where((studio) {
+        final cat = (studio['category'] ?? '').toString().toLowerCase();
+        return cat.contains(_selectedTopCategory.toLowerCase());
+      }).toList();
+    }
+
+    if (_currentPosition != null && _selectedDistance < 20.0) {
+      filtered = filtered.where((studio) {
+        final latStr = studio['latitude']?.toString();
+        final lngStr = studio['longitude']?.toString();
+        if (latStr == null || lngStr == null) return true;
+        
+        final lat = double.tryParse(latStr);
+        final lng = double.tryParse(lngStr);
+        if (lat == null || lng == null) return true;
+
+        final double distanceInKm = const Distance().as(
+          LengthUnit.Kilometer,
+          LatLng(_currentPosition!.latitude, _currentPosition!.longitude),
+          LatLng(lat, lng),
+        );
+        return distanceInKm <= _selectedDistance;
+      }).toList();
+    }
+    
+    return filtered;
+  }
+
   void _showFilters() {
-    // Simple filter placeholder
     showModalBottomSheet(
       context: context,
       shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
       builder: (context) {
-        return Container(
-          padding: const EdgeInsets.all(24),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text('Map Filters', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-              const SizedBox(height: 16),
-              const Text('Distance Radius', style: TextStyle(fontWeight: FontWeight.bold)),
-              Slider(value: 5, min: 1, max: 20, activeColor: AppColors.primary, onChanged: (v){}),
-              const SizedBox(height: 16),
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: () => Navigator.pop(context),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.primary,
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        return StatefulBuilder(
+          builder: (context, setModalState) {
+            return Container(
+              padding: const EdgeInsets.all(24),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text('Map Filters', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                  const SizedBox(height: 16),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text('Distance Radius', style: TextStyle(fontWeight: FontWeight.bold)),
+                      Text('${_selectedDistance.toInt()} km', style: const TextStyle(color: AppColors.primary, fontWeight: FontWeight.bold)),
+                    ],
                   ),
-                  child: const Text('Apply', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-                ),
-              )
-            ],
-          ),
+                  Slider(
+                    value: _selectedDistance,
+                    min: 1, 
+                    max: 20, 
+                    activeColor: AppColors.primary, 
+                    onChanged: (v) {
+                      setModalState(() => _selectedDistance = v);
+                      setState(() => _selectedDistance = v);
+                    }
+                  ),
+                  const SizedBox(height: 16),
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      onPressed: () => Navigator.pop(context),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.primary,
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      ),
+                      child: const Text('Apply', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                    ),
+                  )
+                ],
+              ),
+            );
+          }
         );
       },
     );
   }
 
   List<Marker> _buildMarkers() {
-    return _studios.map((studio) {
+    return _filteredStudios.map((studio) {
       double lat = double.tryParse(studio['latitude']?.toString() ?? '') ?? 0;
       double lng = double.tryParse(studio['longitude']?.toString() ?? '') ?? 0;
       
@@ -305,14 +379,14 @@ class _SearchMapScreenState extends State<SearchMapScreen> {
                     Expanded(
                       child: _isLoading
                           ? const Center(child: CircularProgressIndicator())
-                          : _studios.isEmpty
+                          : _filteredStudios.isEmpty
                               ? const Center(child: Text('No studios found.'))
                               : ListView.builder(
                                   controller: scrollController,
                                   padding: const EdgeInsets.symmetric(horizontal: 20),
-                                  itemCount: _studios.length,
+                                  itemCount: _filteredStudios.length,
                                   itemBuilder: (context, index) {
-                                    final studio = _studios[index];
+                                    final studio = _filteredStudios[index];
                                     return Padding(
                                       padding: const EdgeInsets.only(bottom: 16),
                                       child: _buildStudioCard(
@@ -321,7 +395,7 @@ class _SearchMapScreenState extends State<SearchMapScreen> {
                                         rating: '4.8',
                                         reviews: '(120)',
                                         distance: studio['full_address'] ?? studio['city'] ?? 'Unknown location',
-                                        imagePath: studio['cover_photo'], // using network image if available
+                                        imagePath: studio['image'] ?? studio['cover_photo'] ?? (studio['images'] != null && (studio['images'] as List).isNotEmpty ? studio['images'][0]['image'] : null),
                                         isFavorite: studio['is_favorite'] == true,
                                         onTap: () {
                                           Navigator.pushNamed(context, AppRoutes.studioDetails, arguments: studio['id']);

@@ -22,7 +22,11 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
   }
 
   Future<void> initializePlayer() async {
-    _videoPlayerController = VideoPlayerController.networkUrl(Uri.parse(widget.videoUrl));
+    String url = widget.videoUrl;
+    if (!url.startsWith('http')) {
+      url = 'http://16.170.40.206:8000$url';
+    }
+    _videoPlayerController = VideoPlayerController.networkUrl(Uri.parse(url));
     
     await _videoPlayerController.initialize();
 

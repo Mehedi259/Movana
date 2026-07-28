@@ -732,7 +732,11 @@ class _VideoThumbnailState extends State<_VideoThumbnail> {
   @override
   void initState() {
     super.initState();
-    _controller = VideoPlayerController.networkUrl(Uri.parse(widget.videoUrl))
+    String url = widget.videoUrl;
+    if (!url.startsWith('http')) {
+      url = 'http://16.170.40.206:8000$url';
+    }
+    _controller = VideoPlayerController.networkUrl(Uri.parse(url))
       ..initialize().then((_) {
         if (mounted) {
           setState(() {
