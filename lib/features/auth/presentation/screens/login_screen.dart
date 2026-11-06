@@ -86,7 +86,6 @@ class _LoginScreenState extends State<LoginScreen> {
                 keyboardType: TextInputType.emailAddress,
                 decoration: const InputDecoration(
                   labelText: 'Email',
-                  hintText: 'brooklynsim@gmail.com',
                 ),
               ),
               const SizedBox(height: 20),

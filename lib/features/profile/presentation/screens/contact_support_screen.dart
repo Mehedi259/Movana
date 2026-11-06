@@ -128,7 +128,7 @@ class _ContactSupportScreenState extends State<ContactSupportScreen> {
                   ),
                 ),
               ),
-              const SizedBox(height: 200),
+              const SizedBox(height: 40),
               // Send Message Button
               CustomButton(
                 text: 'Send Message',
